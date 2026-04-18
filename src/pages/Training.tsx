@@ -402,6 +402,7 @@ export default function Training() {
       </div>
 
       <NewExamDialog open={examOpen} onClose={() => setExamOpen(false)} />
+      <ImportMaterialsSheet open={importOpen} onClose={() => setImportOpen(false)} />
     </>
   );
 }
