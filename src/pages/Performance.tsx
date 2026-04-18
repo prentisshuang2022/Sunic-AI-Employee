@@ -56,27 +56,27 @@ const overviewStats = [
   {
     label: "在考周期",
     value: "2025 Q2",
-    hint: "覆盖 12 部门 · 348 人",
+    hint: "覆盖 9 部门 · 202 人",
     icon: Gauge,
     tone: "text-primary",
   },
   {
     label: "待我处理",
-    value: "23",
-    hint: "上级评分 18 · HR 复核 5",
+    value: "14",
+    hint: "上级评分 11 · HR 复核 3",
     icon: ClipboardList,
     tone: "text-amber-600",
   },
   {
     label: "超期未提交",
-    value: "9",
+    value: "5",
     hint: "已自动催办 2 轮",
     icon: Bell,
     tone: "text-rose-600",
   },
   {
     label: "AI 异常预警",
-    value: "6",
+    value: "4",
     hint: "分数与目标达成不符",
     icon: AlertTriangle,
     tone: "text-orange-600",
@@ -93,9 +93,9 @@ const stages: {
   overdue: number;
   status: StageStatus;
 }[] = [
-  { key: "self", name: "员工自评", total: 348, done: 339, overdue: 9, status: "已完成" },
-  { key: "leader", name: "直属上级考评", total: 348, done: 286, overdue: 4, status: "进行中" },
-  { key: "dept", name: "部门负责人考评", total: 12, done: 3, overdue: 0, status: "进行中" },
+  { key: "self", name: "员工自评", total: 202, done: 197, overdue: 5, status: "已完成" },
+  { key: "leader", name: "直属上级考评", total: 202, done: 168, overdue: 3, status: "进行中" },
+  { key: "dept", name: "部门负责人考评", total: 9, done: 2, overdue: 0, status: "进行中" },
   { key: "hr", name: "HR 汇总复核", total: 1, done: 0, overdue: 0, status: "未开始" },
   { key: "gm", name: "总经理确认", total: 1, done: 0, overdue: 0, status: "未开始" },
 ];
@@ -108,9 +108,9 @@ const statusBadge: Record<StageStatus, string> = {
 
 /* ================== 历史周期 ================== */
 const historyCycles = [
-  { id: "2025Q1", name: "2025 Q1 季度考核", scope: "全员 342 人", status: "已结案", coef: "0.96", finishedAt: "2025-04-12" },
-  { id: "2024H2", name: "2024 下半年考核", scope: "全员 336 人", status: "已结案", coef: "1.02", finishedAt: "2025-01-18" },
-  { id: "2024Q3", name: "2024 Q3 季度考核", scope: "全员 330 人", status: "已结案", coef: "0.98", finishedAt: "2024-10-22" },
+  { id: "2025Q1", name: "2025 Q1 季度考核", scope: "全员 198 人", status: "已结案", coef: "0.96", finishedAt: "2025-04-12" },
+  { id: "2024H2", name: "2024 下半年考核", scope: "全员 193 人", status: "已结案", coef: "1.02", finishedAt: "2025-01-18" },
+  { id: "2024Q3", name: "2024 Q3 季度考核", scope: "全员 188 人", status: "已结案", coef: "0.98", finishedAt: "2024-10-22" },
 ];
 
 /* ================== 战略目标分解 ================== */
@@ -278,7 +278,7 @@ export default function Performance() {
         description="战略目标分解 · 指标库 · 过程数据 · AI 评估校验 · 面谈辅助"
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={() => toast.info("已推送催办给 9 名超期员工")}>
+            <Button variant="outline" size="sm" onClick={() => toast.info("已推送催办给 5 名超期员工")}>
               <Bell className="mr-1.5 h-4 w-4" />
               一键催办
             </Button>
@@ -324,7 +324,7 @@ export default function Performance() {
                     <Badge className="bg-blue-50 text-blue-700 border-blue-200" variant="outline">进行中</Badge>
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    周期：2025-04-01 ~ 2025-06-30 · 评估对象 348 人 · 模板「研发/生产/职能 V3.2」
+                    周期：2025-04-01 ~ 2025-06-30 · 评估对象 202 人 · 模板「研发/生产/职能 V3.2」
                   </p>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => navigate("/performance/cycle/2025Q2")}>
@@ -373,7 +373,7 @@ export default function Performance() {
               <div className="mt-5 flex items-start gap-3 rounded-lg border border-orange-200 bg-orange-50/60 p-3">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-orange-600" />
                 <div className="flex-1 text-xs">
-                  <div className="font-medium text-orange-900">AI 发现 6 项分数异常</div>
+                  <div className="font-medium text-orange-900">AI 发现 4 项分数异常</div>
                   <div className="mt-0.5 text-orange-800/80">
                     上级评分与业务系统达成数据偏差超过 ±15%，建议复核后再进入下一阶段，避免 HR 返工。
                   </div>
