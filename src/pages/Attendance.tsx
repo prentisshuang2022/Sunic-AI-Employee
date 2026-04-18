@@ -47,6 +47,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PlaceholderPage } from "@/components/layout/PlaceholderPage";
+import { DateRangeFilter, type DateFilterValue } from "@/components/attendance/DateRangeFilter";
 import { cn } from "@/lib/utils";
 
 // ---------- mock 数据 ----------
@@ -346,6 +347,7 @@ export default function Attendance() {
 
 function ExceptionsPanel() {
   const navigate = useNavigate();
+  const [dateFilter, setDateFilter] = useState<DateFilterValue>({ preset: "today" });
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("pending");
   const [doneIds, setDoneIds] = useState<Set<string>>(new Set());
@@ -375,6 +377,7 @@ function ExceptionsPanel() {
           <p className="mt-1 text-xs text-muted-foreground">需要处理的考勤异常记录</p>
         </div>
         <div className="flex items-center gap-2">
+          <DateRangeFilter value={dateFilter} onChange={setDateFilter} />
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="h-9 w-32">
               <SelectValue placeholder="全部类型" />
@@ -506,6 +509,7 @@ function ExceptionsPanel() {
 // ---------- 加班 / 调休 Tab ----------
 
 function OvertimePanel() {
+  const [dateFilter, setDateFilter] = useState<DateFilterValue>({ preset: "today" });
   const [deptFilter, setDeptFilter] = useState<string>("智能部门");
   const [statusFilter, setStatusFilter] = useState<string>("pending");
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -539,6 +543,7 @@ function OvertimePanel() {
           <p className="mt-1 text-xs text-muted-foreground">需要处理的加班/调休记录</p>
         </div>
         <div className="flex items-center gap-2">
+          <DateRangeFilter value={dateFilter} onChange={setDateFilter} />
           <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setUploadOpen(true)}>
             <Upload className="h-3.5 w-3.5" />
             上传数据
