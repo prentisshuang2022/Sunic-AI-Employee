@@ -206,6 +206,7 @@ export default function Performance() {
   const [family, setFamily] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [newCycleOpen, setNewCycleOpen] = useState(false);
+  const [newIndicatorOpen, setNewIndicatorOpen] = useState(false);
 
   // 战略目标 state
   const [company, setCompany] = useState<CompanyStrategy>(initialCompany);
@@ -739,7 +740,7 @@ export default function Performance() {
                     <Sparkles className="mr-1.5 h-4 w-4" />
                     AI 同步行业基准
                   </Button>
-                  <Button size="sm" onClick={() => toast.success("已新增空白指标")}>
+                  <Button size="sm" onClick={() => setNewIndicatorOpen(true)}>
                     <Plus className="mr-1.5 h-4 w-4" />
                     新增指标
                   </Button>
@@ -977,6 +978,11 @@ export default function Performance() {
         </Tabs>
       </div>
       <NewCycleDialog open={newCycleOpen} onOpenChange={setNewCycleOpen} />
+      <NewIndicatorDialog
+        open={newIndicatorOpen}
+        onOpenChange={setNewIndicatorOpen}
+        defaultFamily={family !== "all" ? family : "mfg"}
+      />
     </div>
   );
 }
