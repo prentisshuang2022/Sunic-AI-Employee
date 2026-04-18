@@ -34,9 +34,7 @@ const toneClass: Record<(typeof stats)[number]["tone"], string> = {
 
 const modules = [
   { title: "员工档案助手", desc: "档案识别、合同到期、钉钉同步", url: "/employees", icon: UserSquare2 },
-  { title: "考勤助手", desc: "异常识别、AI 核验、批量处理", url: "/attendance", icon: CalendarClock },
-  { title: "调休管理", desc: "加班-调休-冲抵闭环", url: "/leave-balance", icon: Repeat2 },
-  { title: "月度复核", desc: "月底闭环、异常确认、台账导出", url: "/monthly-review", icon: ClipboardCheck },
+  { title: "考勤助手", desc: "异常核验、调休冲抵、月度复核闭环", url: "/attendance", icon: CalendarClock },
   { title: "招聘助手", desc: "需求池、画像生成、候选人推荐", url: "/recruiting", icon: Briefcase },
   { title: "绩效助手", desc: "表单收集、AI 校验、汇总分析", url: "/performance", icon: LineChart },
   { title: "培训助手", desc: "考试中心、AI 阅卷、补考闭环", url: "/training", icon: GraduationCap },
@@ -46,7 +44,7 @@ const todos = [
   { tag: "考勤", text: "李明 04-18 迟到 35 分钟，AI 建议补卡", time: "10:15", to: "/attendance/exception/1", tone: "warning" as const },
   { tag: "招聘", text: "财务主管岗位待指派 HR", time: "09:42", to: "/recruiting", tone: "info" as const },
   { tag: "绩效", text: "赵六 校验异常：总分 ≠ 各项加和", time: "昨日", to: "/performance", tone: "danger" as const },
-  { tag: "调休", text: "张伟 余额 -8h，超支无加班证据", time: "昨日", to: "/leave-balance", tone: "warning" as const },
+  { tag: "调休", text: "张伟 余额 -8h，超支无加班证据", time: "昨日", to: "/attendance", tone: "warning" as const },
 ];
 
 const todoTone: Record<"warning" | "info" | "danger", string> = {
