@@ -208,11 +208,11 @@ export default function Employees() {
     <>
       <PageHeader
         title="员工档案管理"
-        description="武汉三工光电 · 钉钉为唯一数据源，本系统单向同步、校验与归档"
+        description="武汉三工光电 · 钉钉为唯一数据源，本系统负责同步、校验与归档"
         actions={
           <>
-            <Button size="sm" onClick={() => toast.success("正在从钉钉拉取员工信息…")}>
-              <ArrowDownToLine className="h-4 w-4 mr-1.5" />从钉钉拉取
+            <Button size="sm" onClick={() => toast.success("正在从钉钉同步员工信息…")}>
+              <ArrowDownToLine className="h-4 w-4 mr-1.5" />从钉钉同步
             </Button>
             <Button variant="outline" size="sm" onClick={() => toast.success(`已导出 ${filtered.length} 条`)}>
               <Download className="h-4 w-4 mr-1.5" />导出
@@ -229,17 +229,17 @@ export default function Employees() {
               <ArrowDownToLine className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1 min-w-[200px]">
-              <div className="text-sm font-medium">钉钉 → 本系统 单向同步</div>
+              <div className="text-sm font-medium">钉钉数据同步</div>
               <div className="text-xs text-muted-foreground mt-0.5">
-                上次全量拉取 <span className="tabular-nums">{lastFullSync}</span> · 当前 <span className="text-warning font-medium">{pendingCount}</span> 名员工待核对
+                上次全量同步 <span className="tabular-nums">{lastFullSync}</span> · 当前 <span className="text-warning font-medium">{pendingCount}</span> 名员工待核对
               </div>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => { setStatFilter("sync"); toast.info("已筛选待核对员工"); }}>
                 查看待核对
               </Button>
-              <Button size="sm" onClick={() => toast.success("已触发全量拉取")}>
-                <RefreshCcw className="h-4 w-4 mr-1.5" />立即拉取
+              <Button size="sm" onClick={() => toast.success("已触发全量同步")}>
+                <RefreshCcw className="h-4 w-4 mr-1.5" />立即同步
               </Button>
             </div>
           </div>
