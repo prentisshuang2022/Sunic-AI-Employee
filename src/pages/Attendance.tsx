@@ -377,6 +377,7 @@ function ExceptionsPanel() {
           <p className="mt-1 text-xs text-muted-foreground">需要处理的考勤异常记录</p>
         </div>
         <div className="flex items-center gap-2">
+          <DateRangeFilter value={dateFilter} onChange={setDateFilter} />
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="h-9 w-32">
               <SelectValue placeholder="全部类型" />
