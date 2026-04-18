@@ -11,11 +11,9 @@ import {
   Sparkles,
   Paperclip,
   History,
-  CloudUpload,
   GitCompare,
   CircleDot,
   ArrowDownToLine,
-  ArrowUpFromLine,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -172,11 +170,8 @@ export default function EmployeeDetail() {
                   仅看差异
                 </Button>
               )}
-              <Button variant="outline" size="sm" onClick={() => toast.success("已从钉钉拉取最新")}>
+              <Button size="sm" onClick={() => toast.success("已从钉钉拉取最新")}>
                 <ArrowDownToLine className="h-4 w-4 mr-1.5" />从钉钉拉取
-              </Button>
-              <Button size="sm" onClick={() => toast.success("已推送到钉钉")}>
-                <ArrowUpFromLine className="h-4 w-4 mr-1.5" />推送钉钉
               </Button>
             </div>
           </div>
@@ -246,7 +241,7 @@ export default function EmployeeDetail() {
           </TabsContent>
 
           <TabsContent value="contract">
-            <SectionCard title="雇佣合同信息卡" hint="本系统维护，可推送到钉钉">
+            <SectionCard title="雇佣合同信息卡" hint="AI 抽取合同附件 + 钉钉同步">
               <Field label="合同性质" value={EMP.contractType} meta={FIELD_META["合同性质"]} />
               <Field label="现合同起止时间" value={`${EMP.contractStart} ~ ${EMP.contractEnd}`} />
               <Field label="现合同到期时间" value={
@@ -390,17 +385,14 @@ export default function EmployeeDetail() {
                 </div>
                 <div className="space-y-3">
                   {[
-                    { date: "2025-04-14 11:08", desc: "钉钉推送：现任职务变更", dir: "in", ok: true },
-                    { date: "2024-09-01 14:22", desc: "本系统下推：部门变更", dir: "out", ok: true },
-                    { date: "2024-09-01 14:22", desc: "本系统下推：职务变更", dir: "out", ok: true },
-                    { date: "2023-05-21 09:10", desc: "本系统下推：合同续签", dir: "out", ok: true },
+                    { date: "2025-04-14 11:08", desc: "钉钉拉取：现任职务变更", ok: true },
+                    { date: "2024-09-01 14:22", desc: "钉钉拉取：部门变更（市场部 → 销售部）", ok: true },
+                    { date: "2023-05-21 09:10", desc: "钉钉拉取：合同续签字段更新", ok: true },
+                    { date: "2020-05-20 10:00", desc: "钉钉拉取：员工建档", ok: true },
                   ].map((r, i) => (
                     <div key={i} className="flex items-start gap-3 text-sm">
-                      <div className={cn(
-                        "h-7 w-7 rounded-md flex items-center justify-center shrink-0",
-                        r.dir === "in" ? "bg-primary/10 text-primary" : "bg-success/10 text-success"
-                      )}>
-                        {r.dir === "in" ? <ArrowDownToLine className="h-3.5 w-3.5" /> : <ArrowUpFromLine className="h-3.5 w-3.5" />}
+                      <div className="h-7 w-7 rounded-md flex items-center justify-center shrink-0 bg-primary/10 text-primary">
+                        <ArrowDownToLine className="h-3.5 w-3.5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="text-xs text-muted-foreground tabular-nums">{r.date}</div>
@@ -490,9 +482,6 @@ function SectionCard({ title, hint, children }: { title: string; hint?: string; 
           <h3 className="font-medium">{title}</h3>
           {hint && <div className="text-xs text-muted-foreground mt-0.5">{hint}</div>}
         </div>
-        <Button variant="ghost" size="sm" onClick={() => toast.success("已推送本卡到钉钉")}>
-          <CloudUpload className="h-3.5 w-3.5 mr-1" />推送本卡
-        </Button>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6">
         {children}
