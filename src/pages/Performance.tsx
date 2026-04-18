@@ -178,9 +178,9 @@ const indicatorFamilies = [
 ];
 const indicatorRows = [
   // 研发部
-  { code: "RD-014", name: "需求按时交付率", family: "研发部", unit: "%", target: "≥ 95", source: "Jira 系统", aiTag: "行业基准 92%" },
+  { code: "RD-014", name: "需求按时交付率", family: "研发部", unit: "%", target: "≥ 95", source: "PLM 系统", aiTag: "行业基准 92%" },
   { code: "RD-021", name: "激光器光路一次调试通过率", family: "研发部", unit: "%", target: "≥ 92", source: "PLM 系统", aiTag: "AI 推荐" },
-  { code: "RD-008", name: "新产品立项→量产周期", family: "研发部", unit: "月", target: "≤ 9", source: "Jira 系统", aiTag: "对标行业 12 月" },
+  { code: "RD-008", name: "新产品立项→量产周期", family: "研发部", unit: "月", target: "≤ 9", source: "PLM 系统", aiTag: "对标行业 12 月" },
   // 生产管理部
   { code: "MF-021", name: "OEE 设备综合效率", family: "生产管理部", unit: "%", target: "≥ 78", source: "MES 系统", aiTag: "对标行业 75%" },
   { code: "MF-014", name: "工时利用率", family: "生产管理部", unit: "%", target: "≥ 85", source: "MES 系统", aiTag: "—" },
@@ -190,7 +190,7 @@ const indicatorRows = [
   { code: "QA-012", name: "激光焊接首件合格率", family: "品质管理部", unit: "%", target: "≥ 96", source: "QMS 系统", aiTag: "新增" },
   { code: "QA-019", name: "客户投诉响应时长", family: "品质管理部", unit: "h", target: "≤ 4", source: "CRM / QMS", aiTag: "—" },
   // 项目管理部
-  { code: "PM-003", name: "重点项目里程碑达成率", family: "项目管理部", unit: "%", target: "100", source: "Jira / 项目台账", aiTag: "AI 推荐" },
+  { code: "PM-003", name: "重点项目里程碑达成率", family: "项目管理部", unit: "%", target: "100", source: "OA / 项目台账", aiTag: "AI 推荐" },
   { code: "PM-009", name: "项目预算执行偏差", family: "项目管理部", unit: "%", target: "≤ 5", source: "ERP / 财务", aiTag: "—" },
   // 营销中心
   { code: "SL-003", name: "回款及时率", family: "营销中心", unit: "%", target: "≥ 92", source: "ERP / 财务", aiTag: "—" },
@@ -220,7 +220,7 @@ const indicatorRows = [
 const dataSources = [
   { name: "MES 制造执行", status: "已联通", lastSync: "5 分钟前", indicators: 14 },
   { name: "ERP / 财务", status: "已联通", lastSync: "12 分钟前", indicators: 9 },
-  { name: "Jira 研发管理", status: "已联通", lastSync: "1 小时前", indicators: 11 },
+  { name: "PLM 产品生命周期", status: "已联通", lastSync: "1 小时前", indicators: 11 },
   { name: "CRM 客户系统", status: "鉴权过期", lastSync: "2 天前", indicators: 7 },
   { name: "QMS 质量管理", status: "已联通", lastSync: "30 分钟前", indicators: 6 },
 ];

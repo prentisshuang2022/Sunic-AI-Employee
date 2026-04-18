@@ -54,7 +54,7 @@ const SOURCE_OPTIONS = [
   { value: "MES", label: "MES 制造执行", auto: true },
   { value: "ERP", label: "ERP / 财务", auto: true },
   { value: "QMS", label: "QMS 质量管理", auto: true },
-  { value: "Jira", label: "Jira 研发管理", auto: true },
+  
   { value: "CRM", label: "CRM 客户系统", auto: true },
   { value: "PLM", label: "PLM 产品生命周期", auto: true },
   { value: "EHS", label: "EHS 安全环境", auto: true },
@@ -77,7 +77,7 @@ const AI_RECOMMENDATIONS: Record<string, Array<{
 }>> = {
   rd: [
     { name: "激光器光路一次调试通过率", unit: "%", target: "≥ 92", source: "PLM", method: "linear", reason: "三工核心工艺，影响交付节拍" },
-    { name: "新产品 NPI 立项→量产周期", unit: "月", target: "≤ 9", source: "Jira", method: "reverse", reason: "对标行业 12 个月" },
+    { name: "新产品 NPI 立项→量产周期", unit: "月", target: "≤ 9", source: "PLM", method: "reverse", reason: "对标行业 12 个月" },
     { name: "BOM 物料标准化率", unit: "%", target: "≥ 75", source: "PLM", method: "linear", reason: "降本核心抓手" },
     { name: "DFMEA 评审覆盖率", unit: "%", target: "100", source: "PLM", method: "linear", reason: "质量前置" },
   ],
@@ -94,9 +94,9 @@ const AI_RECOMMENDATIONS: Record<string, Array<{
     { name: "供应商来料合格率", unit: "%", target: "≥ 98", source: "QMS", method: "linear", reason: "源头质量管控" },
   ],
   pm: [
-    { name: "重点项目里程碑达成率", unit: "%", target: "100", source: "Jira", method: "linear", reason: "战略项目关键" },
+    { name: "重点项目里程碑达成率", unit: "%", target: "100", source: "OA", method: "linear", reason: "战略项目关键" },
     { name: "项目预算执行偏差", unit: "%", target: "≤ 5", source: "ERP", method: "reverse", reason: "成本管控" },
-    { name: "项目交付准时率", unit: "%", target: "≥ 95", source: "Jira", method: "linear", reason: "客户履约" },
+    { name: "项目交付准时率", unit: "%", target: "≥ 95", source: "OA", method: "linear", reason: "客户履约" },
   ],
   sale: [
     { name: "大客户渗透率（新能源/3C）", unit: "%", target: "≥ 35", source: "CRM", method: "linear", reason: "三工战略客户结构" },
