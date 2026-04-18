@@ -422,8 +422,8 @@ export default function Employees() {
                                 <GitCompare className="h-4 w-4 mr-2" />查看差异
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem onClick={() => toast.success("已从钉钉拉取最新")}>
-                              <RefreshCcw className="h-4 w-4 mr-2" />从钉钉重新拉取
+                            <DropdownMenuItem onClick={() => toast.success("已从钉钉同步最新")}>
+                              <RefreshCcw className="h-4 w-4 mr-2" />从钉钉重新同步
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => toast.success("已打开附件上传")}>
