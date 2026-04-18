@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ResumeLibraryPanel } from "./ResumeLibrary";
 import {
   Briefcase,
@@ -11,6 +11,7 @@ import {
   MapPin,
   Clock,
   TrendingUp,
+  Wand2,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,16 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -25,6 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "@/hooks/use-toast";
 
 type JobStatus = "招聘中" | "画像待生成" | "已暂停" | "已完成";
 
@@ -144,6 +156,7 @@ const urgencyStyle: Record<string, string> = {
 };
 
 export default function Recruiting() {
+  const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const mainTab = params.get("tab") === "resumes" ? "resumes" : "jobs";
   const setMainTab = (v: string) => {
@@ -155,6 +168,7 @@ export default function Recruiting() {
   const [statusTab, setStatusTab] = useState<"all" | JobStatus>("all");
   const [keyword, setKeyword] = useState("");
   const [dept, setDept] = useState("all");
+  const [createOpen, setCreateOpen] = useState(false);
 
   const filtered = useMemo(() => {
     return jobs.filter((j) => {
@@ -182,7 +196,7 @@ export default function Recruiting() {
         description="集中管理岗位需求与简历库，AI 协助生成岗位画像并智能匹配候选人"
         actions={
           mainTab === "jobs" ? (
-            <Button size="sm">
+            <Button size="sm" onClick={() => setCreateOpen(true)}>
               <Plus className="h-4 w-4" />新建岗位需求
             </Button>
           ) : null
@@ -272,9 +286,199 @@ export default function Recruiting() {
           <ResumeLibraryPanel />
         )}
       </div>
+
+      <CreateJobDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(jobId, goProfile) => {
+          setCreateOpen(false);
+          if (goProfile) navigate(`/recruiting/job/${jobId}`);
+        }}
+      />
     </div>
   );
 }
+
+interface CreateJobDialogProps {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onCreated: (jobId: string, goProfile: boolean) => void;
+}
+
+function CreateJobDialog({ open, onOpenChange, onCreated }: CreateJobDialogProps) {
+  const [title, setTitle] = useState("");
+  const [deptVal, setDeptVal] = useState("");
+  const [location, setLocation] = useState("");
+  const [headcount, setHeadcount] = useState("1");
+  const [salary, setSalary] = useState("");
+  const [urgency, setUrgency] = useState<"高" | "中" | "低">("中");
+  const [owner, setOwner] = useState("");
+  const [jd, setJd] = useState("");
+
+  const reset = () => {
+    setTitle(""); setDeptVal(""); setLocation(""); setHeadcount("1");
+    setSalary(""); setUrgency("中"); setOwner(""); setJd("");
+  };
+
+  const canSubmit = title.trim() && deptVal && location.trim() && Number(headcount) > 0;
+
+  const submit = (goProfile: boolean) => {
+    if (!canSubmit) {
+      toast({ title: "请完善必填信息", variant: "destructive" });
+      return;
+    }
+    const newId = `J${String(Date.now()).slice(-3)}`;
+    toast({
+      title: "岗位需求已创建",
+      description: goProfile ? "正在跳转到岗位画像页…" : `${title} · ${deptVal} · 招 ${headcount} 人`,
+    });
+    reset();
+    onCreated(newId, goProfile);
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) reset();
+        onOpenChange(v);
+      }}
+    >
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>新建岗位需求</DialogTitle>
+          <DialogDescription>
+            填写岗位基本信息和 JD，提交后可由 AI 自动生成岗位画像
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3 py-2">
+          <Field label="岗位名称" required className="col-span-2">
+            <Input
+              placeholder="如：高级前端工程师"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </Field>
+
+          <Field label="所属部门" required>
+            <Select value={deptVal} onValueChange={setDeptVal}>
+              <SelectTrigger><SelectValue placeholder="选择部门" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="技术中心">技术中心</SelectItem>
+                <SelectItem value="运营中心">运营中心</SelectItem>
+                <SelectItem value="职能部门">职能部门</SelectItem>
+                <SelectItem value="生产一线">生产一线</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Field label="工作地点" required>
+            <Input
+              placeholder="如：上海"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+          </Field>
+
+          <Field label="招聘人数" required>
+            <Input
+              type="number"
+              min={1}
+              value={headcount}
+              onChange={(e) => setHeadcount(e.target.value)}
+            />
+          </Field>
+
+          <Field label="薪资范围">
+            <Input
+              placeholder="如：25-40K"
+              value={salary}
+              onChange={(e) => setSalary(e.target.value)}
+            />
+          </Field>
+
+          <Field label="紧急程度">
+            <Select value={urgency} onValueChange={(v) => setUrgency(v as typeof urgency)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="高">高急（2 周内到岗）</SelectItem>
+                <SelectItem value="中">中（1 个月内到岗）</SelectItem>
+                <SelectItem value="低">低（无明确节点）</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Field label="招聘负责人">
+            <Select value={owner} onValueChange={setOwner}>
+              <SelectTrigger><SelectValue placeholder="选择 HR" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="李婷">李婷</SelectItem>
+                <SelectItem value="王磊">王磊</SelectItem>
+                <SelectItem value="陈芳">陈芳</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Field label="岗位 JD" hint="可粘贴现有 JD，AI 将基于此生成岗位画像" className="col-span-2">
+            <Textarea
+              placeholder="岗位职责：&#10;1. ...&#10;&#10;任职要求：&#10;1. ..."
+              value={jd}
+              onChange={(e) => setJd(e.target.value)}
+              className="min-h-[140px] text-sm"
+            />
+          </Field>
+        </div>
+
+        <div className="ai-card flex items-start gap-2">
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(var(--ai))]" />
+          <div className="text-xs leading-relaxed text-foreground/80">
+            提交后选择「<strong>保存并生成画像</strong>」，AI 将从 JD 中提取硬性要求 / 加分项 / 排除项，
+            并生成评分维度权重，可直接进入候选人智能匹配。
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2 sm:justify-between">
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>取消</Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => submit(false)}>
+              仅保存草稿
+            </Button>
+            <Button onClick={() => submit(true)}>
+              <Wand2 className="h-4 w-4" />保存并生成画像
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function Field({
+  label,
+  required,
+  hint,
+  className = "",
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  hint?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={className}>
+      <Label className="mb-1.5 flex items-center gap-1 text-xs">
+        {label}
+        {required && <span className="text-[hsl(var(--danger))]">*</span>}
+      </Label>
+      {children}
+      {hint && <div className="mt-1 text-[11px] text-muted-foreground">{hint}</div>}
+    </div>
+  );
+}
+
 
 function StatCard({
   icon: Icon,
