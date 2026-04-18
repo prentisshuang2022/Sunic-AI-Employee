@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft, Search, Sparkles, Plus, ChevronRight, Edit3, Trash2,
   ShoppingBasket, Star, Archive, Zap, Sun, Shield, Globe, X, Check,
@@ -85,8 +85,10 @@ const diffLabel: Record<Diff, { label: string; cls: string }> = {
 
 export default function TrainingQuestionBank() {
   const navigate = useNavigate();
-  const [activeCat, setActiveCat] = useState<string>("laser");
-  const [activeSub, setActiveSub] = useState<string>("laser-safe");
+  const [searchParams] = useSearchParams();
+  const initCat = TREE.find(c => c.key === searchParams.get("cat"))?.key ?? "laser";
+  const [activeCat, setActiveCat] = useState<string>(initCat);
+  const [activeSub, setActiveSub] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState<QType | "all">("all");
   const [filterDiff, setFilterDiff] = useState<Diff | "all">("all");
