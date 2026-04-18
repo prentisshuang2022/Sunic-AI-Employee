@@ -34,6 +34,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { NewExamDialog } from "@/components/training/NewExamDialog";
 
 const KPIS = [
   { label: "本月考试场次", value: "24", unit: "场", trend: "↑ 18% 环比", trendKind: "up" as const, icon: ClipboardCheck, foot: "脱岗 18 场 · 在岗抽测 6 场", accent: "primary" },
