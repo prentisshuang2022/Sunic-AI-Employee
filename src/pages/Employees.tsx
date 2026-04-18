@@ -317,7 +317,7 @@ export default function Employees() {
                 <Select value={contractFilter} onValueChange={setContractFilter}>
                   <SelectTrigger className="w-[140px]"><SelectValue placeholder="合同状态" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">全部合同</SelectItem>
+                    <SelectItem value="all">全部合同状态</SelectItem>
                     <SelectItem value="normal">正常</SelectItem>
                     <SelectItem value="soon">即将到期</SelectItem>
                     <SelectItem value="expired">已到期</SelectItem>
