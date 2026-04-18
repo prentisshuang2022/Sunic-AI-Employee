@@ -506,10 +506,13 @@ function ExceptionsPanel() {
 // ---------- 加班 / 调休 Tab ----------
 
 function OvertimePanel() {
-  const [deptFilter, setDeptFilter] = useState<string>("all");
+  const [deptFilter, setDeptFilter] = useState<string>("智能部门");
   const [statusFilter, setStatusFilter] = useState<string>("pending");
   const [uploadOpen, setUploadOpen] = useState(false);
   const [approvedIds, setApprovedIds] = useState<Set<string>>(new Set());
+
+  // 智能部门不展示「工时」列；生产一线 / 全部部门 展示
+  const showWorkHours = deptFilter !== "智能部门";
 
   const rows = useMemo(() => {
     return overtimeRows.map((r) =>
