@@ -19,6 +19,11 @@ import PerformanceCycle from "./pages/PerformanceCycle";
 import PerformanceForm from "./pages/PerformanceForm";
 import PerformanceInterview from "./pages/PerformanceInterview";
 import Training from "./pages/Training";
+import TrainingMaterials from "./pages/TrainingMaterials";
+import TrainingOffsite from "./pages/TrainingOffsite";
+import TrainingQuestionBank from "./pages/TrainingQuestionBank";
+import TrainingOnsite from "./pages/TrainingOnsite";
+import TrainingMentors from "./pages/TrainingMentors";
 import ChatNew from "./pages/ChatNew";
 import ChatHistory from "./pages/ChatHistory";
 import NotFound from "./pages/NotFound.tsx";
@@ -47,6 +52,11 @@ const App = () => (
             <Route path="/performance/form/:id" element={<PerformanceForm />} />
             <Route path="/performance/interview/:id" element={<PerformanceInterview />} />
             <Route path="/training" element={<Training />} />
+            <Route path="/training/materials" element={<TrainingMaterials />} />
+            <Route path="/training/offsite" element={<TrainingOffsite />} />
+            <Route path="/training/question-bank" element={<TrainingQuestionBank />} />
+            <Route path="/training/onsite" element={<TrainingOnsite />} />
+            <Route path="/training/mentors" element={<TrainingMentors />} />
             <Route path="/chat/new" element={<ChatNew />} />
             <Route path="/chat/history" element={<ChatHistory />} />
           </Route>
