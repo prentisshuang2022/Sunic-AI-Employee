@@ -54,12 +54,14 @@ interface Row {
 }
 
 const rows: Row[] = [
-  { id: "E1001", name: "王 磊", dept: "智能装备事业部", role: "高级工艺工程师", selfScore: 88, leaderScore: 87, deptScore: null, status: "待部门评" },
-  { id: "E1002", name: "李 雪", dept: "销售中心", role: "大客户经理", selfScore: 90, leaderScore: 72, deptScore: null, status: "AI 异常", anomaly: "自评-上级偏差 18 分，AI 建议复核" },
-  { id: "E1003", name: "张 涛", dept: "研发中心", role: "光学算法工程师", selfScore: 92, leaderScore: 92, deptScore: 91, status: "已提交" },
-  { id: "E1004", name: "孙 玥", dept: "供应链中心", role: "采购主管", selfScore: 80, leaderScore: 65, deptScore: null, status: "AI 异常", anomaly: "上级评分与 ERP 成本数据不一致" },
-  { id: "E1005", name: "陈 立", dept: "智能装备事业部", role: "装配技师", selfScore: null, leaderScore: null, deptScore: null, status: "超期" },
-  { id: "E1006", name: "周 颖", dept: "研发中心", role: "结构工程师", selfScore: 85, leaderScore: null, deptScore: null, status: "待上级评" },
+  { id: "E1001", name: "王 磊", dept: "生产管理部", role: "高级工艺工程师", selfScore: 88, leaderScore: 87, deptScore: null, status: "待部门评" },
+  { id: "E1002", name: "李 雪", dept: "营销中心", role: "大客户经理", selfScore: 90, leaderScore: 72, deptScore: null, status: "AI 异常", anomaly: "自评-上级偏差 18 分，AI 建议复核" },
+  { id: "E1003", name: "张 涛", dept: "研发部", role: "光学算法工程师", selfScore: 92, leaderScore: 92, deptScore: 91, status: "已提交" },
+  { id: "E1004", name: "孙 玥", dept: "供应链", role: "采购主管", selfScore: 80, leaderScore: 65, deptScore: null, status: "AI 异常", anomaly: "上级评分与 ERP 成本数据不一致" },
+  { id: "E1005", name: "陈 立", dept: "生产管理部", role: "装配技师", selfScore: null, leaderScore: null, deptScore: null, status: "超期" },
+  { id: "E1006", name: "周 颖", dept: "研发部", role: "结构工程师", selfScore: 85, leaderScore: null, deptScore: null, status: "待上级评" },
+  { id: "E1007", name: "吴 敏", dept: "品质管理部", role: "质量主管", selfScore: 86, leaderScore: 84, deptScore: null, status: "待部门评" },
+  { id: "E1008", name: "黄 强", dept: "项目管理部", role: "项目经理", selfScore: 89, leaderScore: 88, deptScore: null, status: "待部门评" },
 ];
 
 const statusTone: Record<Row["status"], string> = {
@@ -181,10 +183,17 @@ export default function PerformanceCycle() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">全部部门</SelectItem>
-                    <SelectItem value="智能装备事业部">智能装备事业部</SelectItem>
-                    <SelectItem value="研发中心">研发中心</SelectItem>
-                    <SelectItem value="销售中心">销售中心</SelectItem>
-                    <SelectItem value="供应链中心">供应链中心</SelectItem>
+                    <SelectItem value="研发部">研发部</SelectItem>
+                    <SelectItem value="生产管理部">生产管理部</SelectItem>
+                    <SelectItem value="品质管理部">品质管理部</SelectItem>
+                    <SelectItem value="项目管理部">项目管理部</SelectItem>
+                    <SelectItem value="营销中心">营销中心</SelectItem>
+                    <SelectItem value="商务部">商务部</SelectItem>
+                    <SelectItem value="市场营销部">市场营销部</SelectItem>
+                    <SelectItem value="供应链">供应链</SelectItem>
+                    <SelectItem value="财务中心">财务中心</SelectItem>
+                    <SelectItem value="综合管理部">综合管理部</SelectItem>
+                    <SelectItem value="物业">物业</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

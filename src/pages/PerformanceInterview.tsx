@@ -56,7 +56,7 @@ export default function PerformanceInterview() {
     <div className="flex flex-col">
       <PageHeader
         title="绩效面谈报告"
-        description="王磊 · 智能装备事业部 · 高级工艺工程师 · 2025 Q2 · 总分 87 (B+)"
+        description="王磊 · 生产管理部 · 高级工艺工程师 · 2025 Q2 · 总分 87 (B+)"
         backTo="/performance"
         backLabel="返回绩效助手"
         actions={
