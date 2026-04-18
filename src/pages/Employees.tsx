@@ -110,7 +110,7 @@ const MOCK: EmployeeRow[] = [
 ];
 
 const stats = [
-  { key: "sync", label: "待同步钉钉", value: MOCK.filter(m => m.syncStatus === "pending" || m.syncStatus === "diff" || m.syncStatus === "failed").length, icon: CloudUpload, accent: "text-primary bg-primary/10", primary: true },
+  { key: "sync", label: "待同步钉钉", value: MOCK.filter(m => m.syncStatus === "pending" || m.syncStatus === "diff" || m.syncStatus === "failed").length, icon: ArrowDownToLine, accent: "text-primary bg-primary/10", primary: true },
   { key: "contract", label: "合同30天内到期", value: 3, icon: FileWarning, accent: "text-destructive bg-destructive/10" },
   { key: "id", label: "身份证30天内到期", value: 2, icon: IdCard, accent: "text-warning bg-warning/10" },
   { key: "missing", label: "资料缺失", value: MOCK.filter(m => m.completeness < 100).length, icon: AlertTriangle, accent: "text-muted-foreground bg-muted" },
