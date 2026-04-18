@@ -333,7 +333,7 @@ export default function Employees() {
                   <CheckCircle2 className="h-4 w-4 text-primary" />
                   已选 <span className="font-medium">{selected.length}</span> 名员工
                   <div className="flex-1" />
-                  <Button size="sm" variant="outline" onClick={() => toast.success("已重新从钉钉拉取")}>重新拉取</Button>
+                  <Button size="sm" variant="outline" onClick={() => toast.success("已重新从钉钉同步")}>重新同步</Button>
                   <Button size="sm" variant="outline" onClick={() => toast.success("已接受钉钉变更")}>接受钉钉变更</Button>
                   <Button size="sm" variant="outline" onClick={() => toast.success("提醒已发送")}>提醒补资料</Button>
                   <Button size="sm" variant="ghost" onClick={() => setSelected([])}>取消</Button>
