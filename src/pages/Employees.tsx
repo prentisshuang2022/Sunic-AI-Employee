@@ -165,7 +165,19 @@ export default function Employees() {
   const [selected, setSelected] = useState<string[]>([]);
   const [diffOpen, setDiffOpen] = useState<EmployeeRow | null>(null);
 
-  const departments = useMemo(() => Array.from(new Set(MOCK.map((m) => m.department))), []);
+  const departments = [
+    "财务中心",
+    "供应链",
+    "品质管理部",
+    "生产管理部",
+    "商务部",
+    "市场营销部",
+    "项目管理部",
+    "研发部",
+    "营销中心",
+    "综合管理部",
+    "物业",
+  ];
 
   const filtered = useMemo(() => {
     return MOCK.filter((r) => {
