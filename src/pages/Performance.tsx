@@ -732,25 +732,6 @@ export default function Performance() {
 
           {/* ============ 指标库 ============ */}
           <TabsContent value="library" className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-              {indicatorFamilies.map((f) => (
-                <Card
-                  key={f.key}
-                  onClick={() => setFamily(f.key)}
-                  className={cn(
-                    "cursor-pointer p-3 transition-colors",
-                    family === f.key ? "border-primary bg-primary-soft/40" : "hover:bg-muted/40",
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold">{f.name}</span>
-                    <FileSpreadsheet className="h-3.5 w-3.5 text-muted-foreground" />
-                  </div>
-                  <div className="mt-1.5 text-lg font-semibold">{f.count}</div>
-                  <div className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">{f.recent}</div>
-                </Card>
-              ))}
-            </div>
 
             <Card className="p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
