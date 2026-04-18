@@ -156,6 +156,7 @@ const urgencyStyle: Record<string, string> = {
 };
 
 export default function Recruiting() {
+  const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const mainTab = params.get("tab") === "resumes" ? "resumes" : "jobs";
   const setMainTab = (v: string) => {
@@ -167,6 +168,7 @@ export default function Recruiting() {
   const [statusTab, setStatusTab] = useState<"all" | JobStatus>("all");
   const [keyword, setKeyword] = useState("");
   const [dept, setDept] = useState("all");
+  const [createOpen, setCreateOpen] = useState(false);
 
   const filtered = useMemo(() => {
     return jobs.filter((j) => {
@@ -194,7 +196,7 @@ export default function Recruiting() {
         description="集中管理岗位需求与简历库，AI 协助生成岗位画像并智能匹配候选人"
         actions={
           mainTab === "jobs" ? (
-            <Button size="sm">
+            <Button size="sm" onClick={() => setCreateOpen(true)}>
               <Plus className="h-4 w-4" />新建岗位需求
             </Button>
           ) : null
