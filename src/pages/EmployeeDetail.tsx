@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { TransferDialog } from "@/components/employees/TransferDialog";
+import { LeaveDialog } from "@/components/employees/LeaveDialog";
 
 const ENTITY = "武汉三工光电设备制造有限公司";
 
@@ -112,6 +114,8 @@ const FIELD_META: Record<string, FieldMeta> = {
 export default function EmployeeDetail() {
   useParams(); // id
   const [diffOnly, setDiffOnly] = useState(false);
+  const [transferOpen, setTransferOpen] = useState(false);
+  const [leaveOpen, setLeaveOpen] = useState(false);
 
   const diffCount = Object.values(FIELD_META).filter((m) => m.diff).length;
 
@@ -127,10 +131,10 @@ export default function EmployeeDetail() {
             <Button variant="outline" size="sm" onClick={() => toast.success("已通过钉钉发送提醒")}>
               <BellRing className="h-4 w-4 mr-1.5" />钉钉提醒
             </Button>
-            <Button variant="outline" size="sm" onClick={() => toast.success("已发起调岗")}>
+            <Button variant="outline" size="sm" onClick={() => setTransferOpen(true)}>
               <ArrowRightLeft className="h-4 w-4 mr-1.5" />发起调岗
             </Button>
-            <Button variant="outline" size="sm" onClick={() => toast.success("已发起离职流程")}>
+            <Button variant="outline" size="sm" onClick={() => setLeaveOpen(true)}>
               <LogOut className="h-4 w-4 mr-1.5" />发起离职
             </Button>
           </>
@@ -433,6 +437,29 @@ export default function EmployeeDetail() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <TransferDialog
+        ctx={{
+          id: EMP.id,
+          name: EMP.name,
+          department: EMP.department,
+          position: EMP.position,
+          payroll: EMP.payroll,
+        }}
+        open={transferOpen}
+        onClose={() => setTransferOpen(false)}
+      />
+      <LeaveDialog
+        ctx={{
+          id: EMP.id,
+          name: EMP.name,
+          department: EMP.department,
+          position: EMP.position,
+          hireDate: EMP.hireDate,
+        }}
+        open={leaveOpen}
+        onClose={() => setLeaveOpen(false)}
+      />
     </>
   );
 }
