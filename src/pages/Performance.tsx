@@ -432,57 +432,256 @@ export default function Performance() {
 
           {/* ============ 战略目标分解 ============ */}
           <TabsContent value="strategy" className="space-y-4">
+            {/* 公司战略目标 */}
             <Card className="p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Target className="h-4 w-4 text-primary" />
-                  <h3 className="text-sm font-semibold">{strategy.company.title}</h3>
+                  {editingCompany ? (
+                    <Input
+                      value={company.title}
+                      onChange={(e) => setCompany({ ...company, title: e.target.value })}
+                      className="h-8 w-72 text-sm font-semibold"
+                    />
+                  ) : (
+                    <h3 className="text-sm font-semibold">{company.title}</h3>
+                  )}
+                  <Badge variant="outline" className="text-[10px]">{company.period}</Badge>
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "text-[10px]",
+                      companyWeightSum === 100
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        : "bg-amber-50 text-amber-700 border-amber-200",
+                    )}
+                  >
+                    权重合计 {companyWeightSum}%
+                  </Badge>
                 </div>
-                <Button size="sm" onClick={() => toast.success("AI 已基于公司目标重新拆解 12 个部门 KPI")}>
-                  <Wand2 className="mr-1.5 h-4 w-4" />
-                  AI 一键拆解到部门
-                </Button>
+                <div className="flex gap-2">
+                  {editingCompany ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditingCompany(false);
+                          setCompany(initialCompany);
+                          toast.info("已撤销修改");
+                        }}
+                      >
+                        <X className="mr-1.5 h-4 w-4" />
+                        取消
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          if (companyWeightSum !== 100) {
+                            toast.error(`权重合计为 ${companyWeightSum}%，需调整为 100% 后保存`);
+                            return;
+                          }
+                          setEditingCompany(false);
+                          toast.success("公司战略目标已保存");
+                        }}
+                      >
+                        <Save className="mr-1.5 h-4 w-4" />
+                        保存
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button variant="outline" size="sm" onClick={() => setEditingCompany(true)}>
+                        <Pencil className="mr-1.5 h-4 w-4" />
+                        编辑公司目标
+                      </Button>
+                      <Button size="sm" onClick={aiBreakdown}>
+                        <Wand2 className="mr-1.5 h-4 w-4" />
+                        AI 一键拆解到部门
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="mt-4 grid gap-2 md:grid-cols-5">
-                {strategy.company.items.map((it) => (
-                  <div key={it.kpi} className="rounded-lg border bg-muted/30 p-3">
-                    <div className="text-xs text-muted-foreground">{it.kpi}</div>
-                    <div className="mt-1 text-sm font-semibold">{it.target}</div>
-                    <Badge variant="outline" className="mt-2 text-[10px]">权重 {it.weight}</Badge>
+
+              {/* 公司目标列表 */}
+              {editingCompany ? (
+                <div className="mt-4 space-y-2">
+                  <div className="grid grid-cols-12 gap-2 px-1 text-[11px] text-muted-foreground">
+                    <div className="col-span-5">KPI 名称</div>
+                    <div className="col-span-4">目标值</div>
+                    <div className="col-span-2">权重</div>
+                    <div className="col-span-1" />
                   </div>
-                ))}
-              </div>
+                  {company.items.map((it, i) => (
+                    <div key={i} className="grid grid-cols-12 items-center gap-2">
+                      <Input
+                        value={it.kpi}
+                        onChange={(e) => updateCompanyItem(i, "kpi", e.target.value)}
+                        placeholder="如 营业收入"
+                        className="col-span-5 h-9"
+                      />
+                      <Input
+                        value={it.target}
+                        onChange={(e) => updateCompanyItem(i, "target", e.target.value)}
+                        placeholder="如 12.6 亿元"
+                        className="col-span-4 h-9"
+                      />
+                      <Input
+                        value={it.weight}
+                        onChange={(e) => updateCompanyItem(i, "weight", e.target.value)}
+                        placeholder="30%"
+                        className="col-span-2 h-9"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="col-span-1 h-9 w-9 text-muted-foreground hover:text-destructive"
+                        onClick={() => removeCompanyItem(i)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" onClick={addCompanyItem} className="w-full">
+                    <Plus className="mr-1.5 h-4 w-4" />
+                    新增 KPI 行
+                  </Button>
+                  <div className="rounded-md bg-muted/40 p-2 text-[11px] text-muted-foreground">
+                    提示：保存公司目标后，可点击「AI 一键拆解到部门」自动生成各部门 KPI 草稿，再由部门负责人微调。
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 grid gap-2 md:grid-cols-5">
+                  {company.items.map((it, i) => (
+                    <div key={i} className="rounded-lg border bg-muted/30 p-3">
+                      <div className="text-xs text-muted-foreground">{it.kpi || "未命名"}</div>
+                      <div className="mt-1 text-sm font-semibold">{it.target || "—"}</div>
+                      <Badge variant="outline" className="mt-2 text-[10px]">权重 {it.weight}</Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card>
 
+            {/* 部门 KPI 卡片 */}
             <div className="grid gap-3 lg:grid-cols-3">
-              {strategy.depts.map((d) => (
-                <Card key={d.name} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-semibold">{d.name}</div>
-                      <div className="text-xs text-muted-foreground">负责人：{d.head}</div>
-                    </div>
-                    <Badge variant="outline" className="bg-primary-soft text-primary border-primary/20">
-                      {d.kpis.length} 项 KPI
-                    </Badge>
-                  </div>
-                  <div className="mt-3 space-y-2">
-                    {d.kpis.map((k) => (
-                      <div key={k.kpi} className="rounded-md border bg-card p-2.5">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-medium">{k.kpi}</span>
-                          <span className="text-[10px] text-muted-foreground">权重 {k.weight}</span>
-                        </div>
-                        <div className="mt-1 text-xs text-muted-foreground">目标：{k.target}</div>
+              {depts.map((d) => {
+                const isEditing = editingDept === d.name;
+                const wSum = d.kpis.reduce((s, k) => s + (parseInt(k.weight) || 0), 0);
+                return (
+                  <Card key={d.name} className="p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold">{d.name}</div>
+                        <div className="text-xs text-muted-foreground">负责人：{d.head}</div>
                       </div>
-                    ))}
-                  </div>
-                  <Button variant="ghost" size="sm" className="mt-3 w-full" onClick={() => toast.info(`已展开${d.name}的个人 KPI 拆解`)}>
-                    继续拆解到个人
-                    <ChevronRight className="ml-1 h-4 w-4" />
-                  </Button>
-                </Card>
-              ))}
+                      <div className="flex shrink-0 items-center gap-1">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-[10px]",
+                            wSum === 100
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : "bg-amber-50 text-amber-700 border-amber-200",
+                          )}
+                        >
+                          {d.kpis.length} 项 · {wSum}%
+                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={() => setEditingDept(isEditing ? null : d.name)}
+                        >
+                          {isEditing ? <X className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 space-y-2">
+                      {d.kpis.map((k, i) =>
+                        isEditing ? (
+                          <div key={i} className="space-y-1.5 rounded-md border bg-muted/20 p-2">
+                            <div className="flex gap-1.5">
+                              <Input
+                                value={k.kpi}
+                                onChange={(e) => updateDeptKpi(d.name, i, "kpi", e.target.value)}
+                                placeholder="KPI 名称"
+                                className="h-8 text-xs"
+                              />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+                                onClick={() => removeDeptKpi(d.name, i)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                            <div className="flex gap-1.5">
+                              <Input
+                                value={k.target}
+                                onChange={(e) => updateDeptKpi(d.name, i, "target", e.target.value)}
+                                placeholder="目标值"
+                                className="h-8 text-xs"
+                              />
+                              <Input
+                                value={k.weight}
+                                onChange={(e) => updateDeptKpi(d.name, i, "weight", e.target.value)}
+                                placeholder="权重"
+                                className="h-8 w-20 text-xs"
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div key={i} className="rounded-md border bg-card p-2.5">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-xs font-medium">{k.kpi || "未命名"}</span>
+                              <span className="text-[10px] text-muted-foreground">权重 {k.weight}</span>
+                            </div>
+                            <div className="mt-1 text-xs text-muted-foreground">目标：{k.target || "—"}</div>
+                          </div>
+                        ),
+                      )}
+                    </div>
+
+                    {isEditing ? (
+                      <div className="mt-3 flex gap-2">
+                        <Button variant="outline" size="sm" className="flex-1" onClick={() => addDeptKpi(d.name)}>
+                          <Plus className="mr-1 h-3.5 w-3.5" />
+                          新增
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => {
+                            if (wSum !== 100) {
+                              toast.error(`${d.name} 权重合计 ${wSum}%，需为 100%`);
+                              return;
+                            }
+                            setEditingDept(null);
+                            toast.success(`${d.name} KPI 已保存`);
+                          }}
+                        >
+                          <Save className="mr-1 h-3.5 w-3.5" />
+                          保存
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mt-3 w-full"
+                        onClick={() => toast.info(`已展开${d.name}的个人 KPI 拆解`)}
+                      >
+                        继续拆解到个人
+                        <ChevronRight className="ml-1 h-4 w-4" />
+                      </Button>
+                    )}
+                  </Card>
+                );
+              })}
             </div>
           </TabsContent>
 
