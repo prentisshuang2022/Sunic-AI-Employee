@@ -574,7 +574,7 @@ function OvertimePanel() {
               <TableHead>上/下班打卡时间</TableHead>
               <TableHead>打卡异常情况</TableHead>
               <TableHead>是否加班</TableHead>
-              <TableHead>工时</TableHead>
+              {showWorkHours && <TableHead>工时</TableHead>}
               <TableHead>加班补贴类型</TableHead>
               <TableHead>补贴内容</TableHead>
               <TableHead>备注</TableHead>
@@ -610,7 +610,11 @@ function OvertimePanel() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-sm">{row.isOvertime}</TableCell>
-                <TableCell className="text-sm">{row.workHours}</TableCell>
+                {showWorkHours && (
+                  <TableCell className="text-sm">
+                    {row.dept === "生产一线" ? row.workHours : "—"}
+                  </TableCell>
+                )}
                 <TableCell className="text-sm text-muted-foreground">{row.subsidyType}</TableCell>
                 <TableCell className="text-sm text-muted-foreground">{row.subsidyValue}</TableCell>
                 <TableCell className="text-sm text-muted-foreground">{row.remark}</TableCell>
@@ -650,7 +654,7 @@ function OvertimePanel() {
             ))}
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={12} className="py-12 text-center text-sm text-muted-foreground">
+                <TableCell colSpan={showWorkHours ? 12 : 11} className="py-12 text-center text-sm text-muted-foreground">
                   当前筛选条件下没有记录
                 </TableCell>
               </TableRow>
