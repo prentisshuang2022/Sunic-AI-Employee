@@ -218,11 +218,11 @@ const indicatorRows = [
 
 /* ================== 过程数据 ================== */
 const dataSources = [
-  { name: "MES 制造执行", status: "已联通", lastSync: "5 分钟前", indicators: 14 },
+  { name: "MES 制造执行", status: "暂未联通", lastSync: "—", indicators: 14 },
   { name: "ERP / 财务", status: "已联通", lastSync: "12 分钟前", indicators: 9 },
-  { name: "PLM 产品生命周期", status: "已联通", lastSync: "1 小时前", indicators: 11 },
-  { name: "CRM 客户系统", status: "鉴权过期", lastSync: "2 天前", indicators: 7 },
-  { name: "QMS 质量管理", status: "已联通", lastSync: "30 分钟前", indicators: 6 },
+  { name: "PLM 产品生命周期", status: "暂未联通", lastSync: "—", indicators: 11 },
+  { name: "CRM 客户系统", status: "暂未联通", lastSync: "—", indicators: 7 },
+  { name: "QMS 质量管理", status: "暂未联通", lastSync: "—", indicators: 6 },
 ];
 const progressRows = [
   { dept: "生产管理部", kpi: "订单交付准时率", target: "98%", current: 96.4, trend: "down", risk: "预警" },
@@ -825,6 +825,8 @@ export default function Performance() {
                       <span className="text-sm font-medium">{s.name}</span>
                       {s.status === "已联通" ? (
                         <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                      ) : s.status === "暂未联通" ? (
+                        <Database className="h-4 w-4 text-muted-foreground" />
                       ) : (
                         <AlertTriangle className="h-4 w-4 text-rose-600" />
                       )}
@@ -837,6 +839,8 @@ export default function Performance() {
                         "mt-2 text-[10px]",
                         s.status === "已联通"
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : s.status === "暂未联通"
+                          ? "bg-muted text-muted-foreground border-border"
                           : "bg-rose-50 text-rose-700 border-rose-200",
                       )}
                     >
