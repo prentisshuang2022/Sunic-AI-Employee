@@ -51,6 +51,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { NewCycleDialog } from "@/components/performance/NewCycleDialog";
+import { NewIndicatorDialog } from "@/components/performance/NewIndicatorDialog";
 
 /* ================== 顶部核心指标 ================== */
 const overviewStats = [
