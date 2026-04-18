@@ -3,17 +3,19 @@ import { Link } from "react-router-dom";
 import {
   FileWarning,
   IdCard,
-  Users,
   RefreshCcw,
   Search,
   Filter,
-  Upload,
   Download,
-  Sparkles,
   AlertTriangle,
   CheckCircle2,
   MoreHorizontal,
   X,
+  ArrowUpDown,
+  CloudUpload,
+  CircleDot,
+  Paperclip,
+  GitCompare,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -37,32 +39,44 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 type ContractStatus = "normal" | "soon" | "expired";
 type IdStatus = "normal" | "soon" | "expired";
 type EmployeeStatus = "active" | "leaving" | "pending";
+type SyncStatus = "synced" | "pending" | "diff" | "failed";
+
+interface DiffField {
+  field: string;
+  dingtalk: string;
+  system: string;
+}
 
 interface EmployeeRow {
   id: string;
   name: string;
   status: EmployeeStatus;
-  entity: string; // 合同归属
+  entity: string;
   department: string;
   position: string;
   hireDate: string;
@@ -73,27 +87,34 @@ interface EmployeeRow {
   completeness: number;
   lastChange: string;
   phone: string;
-  education: string;
+  syncStatus: SyncStatus;
+  lastSyncAt: string;
+  diffs: DiffField[];
 }
 
 const ENTITY = "武汉三工光电设备制造有限公司";
 
 const MOCK: EmployeeRow[] = [
-  { id: "E001", name: "李明", status: "active", entity: ENTITY, department: "激光技术部", position: "高级激光工程师", hireDate: "2022-03-15", contractEnd: "2026-03-14", contractStatus: "normal", idEnd: "2031-08-12", idStatus: "normal", completeness: 100, lastChange: "转正", phone: "138****2381", education: "硕士" },
-  { id: "E002", name: "王芳", status: "active", entity: ENTITY, department: "市场部", position: "市场经理", hireDate: "2021-08-01", contractEnd: "2025-12-30", contractStatus: "soon", idEnd: "2029-04-22", idStatus: "normal", completeness: 100, lastChange: "部门变动，需同步钉钉", phone: "139****1102", education: "本科" },
-  { id: "E003", name: "张伟", status: "active", entity: ENTITY, department: "销售部", position: "销售主管", hireDate: "2020-05-20", contractEnd: "2026-05-19", contractStatus: "normal", idEnd: "2025-12-15", idStatus: "soon", completeness: 75, lastChange: "岗位变动，需同步", phone: "137****6612", education: "本科" },
-  { id: "E004", name: "刘洋", status: "active", entity: ENTITY, department: "技术研发中心", position: "前端开发", hireDate: "2023-01-10", contractEnd: "2026-01-09", contractStatus: "normal", idEnd: "2030-09-01", idStatus: "normal", completeness: 100, lastChange: "入职", phone: "186****8821", education: "本科" },
-  { id: "E005", name: "陈静", status: "active", entity: ENTITY, department: "技术研发中心", position: "后端开发", hireDate: "2023-06-01", contractEnd: "2026-05-31", contractStatus: "normal", idEnd: "2032-02-18", idStatus: "normal", completeness: 75, lastChange: "入职", phone: "159****3344", education: "本科" },
-  { id: "E006", name: "黄磊", status: "active", entity: ENTITY, department: "产品部", position: "产品经理", hireDate: "2022-11-15", contractEnd: "2025-11-14", contractStatus: "expired", idEnd: "2028-07-30", idStatus: "normal", completeness: 100, lastChange: "调岗", phone: "188****9092", education: "硕士" },
-  { id: "E007", name: "赵强", status: "active", entity: ENTITY, department: "光学装配车间", position: "装配技师", hireDate: "2019-04-08", contractEnd: "2026-04-07", contractStatus: "normal", idEnd: "2025-11-20", idStatus: "soon", completeness: 80, lastChange: "续签", phone: "135****4471", education: "大专" },
-  { id: "E008", name: "周敏", status: "active", entity: ENTITY, department: "财务部", position: "会计主管", hireDate: "2018-09-12", contractEnd: "2027-09-11", contractStatus: "normal", idEnd: "2033-05-04", idStatus: "normal", completeness: 100, lastChange: "—", phone: "131****0908", education: "本科" },
+  { id: "E001", name: "李明", status: "active", entity: ENTITY, department: "激光技术部", position: "高级激光工程师", hireDate: "2022-03-15", contractEnd: "2026-03-14", contractStatus: "normal", idEnd: "2031-08-12", idStatus: "normal", completeness: 100, lastChange: "转正", phone: "138****2381", syncStatus: "synced", lastSyncAt: "2025-04-15 09:32", diffs: [] },
+  { id: "E002", name: "王芳", status: "active", entity: ENTITY, department: "市场部", position: "市场经理", hireDate: "2021-08-01", contractEnd: "2025-12-30", contractStatus: "soon", idEnd: "2029-04-22", idStatus: "normal", completeness: 100, lastChange: "部门变动", phone: "139****1102", syncStatus: "diff", lastSyncAt: "2025-04-16 14:21", diffs: [
+    { field: "部门", dingtalk: "市场部 / 品牌组", system: "市场部" },
+    { field: "手机号", dingtalk: "139****1108", system: "139****1102" },
+  ]},
+  { id: "E003", name: "张伟", status: "active", entity: ENTITY, department: "销售部", position: "销售主管", hireDate: "2020-05-20", contractEnd: "2026-05-19", contractStatus: "normal", idEnd: "2025-12-15", idStatus: "soon", completeness: 75, lastChange: "岗位变动", phone: "137****6612", syncStatus: "diff", lastSyncAt: "2025-04-14 11:08", diffs: [
+    { field: "现任职务", dingtalk: "销售总监", system: "销售主管" },
+  ]},
+  { id: "E004", name: "刘洋", status: "active", entity: ENTITY, department: "技术研发中心", position: "前端开发", hireDate: "2023-01-10", contractEnd: "2026-01-09", contractStatus: "normal", idEnd: "2030-09-01", idStatus: "normal", completeness: 100, lastChange: "入职", phone: "186****8821", syncStatus: "synced", lastSyncAt: "2025-04-16 08:00", diffs: [] },
+  { id: "E005", name: "陈静", status: "active", entity: ENTITY, department: "技术研发中心", position: "后端开发", hireDate: "2023-06-01", contractEnd: "2026-05-31", contractStatus: "normal", idEnd: "2032-02-18", idStatus: "normal", completeness: 75, lastChange: "入职", phone: "159****3344", syncStatus: "pending", lastSyncAt: "—", diffs: [] },
+  { id: "E006", name: "黄磊", status: "active", entity: ENTITY, department: "产品部", position: "产品经理", hireDate: "2022-11-15", contractEnd: "2025-11-14", contractStatus: "expired", idEnd: "2028-07-30", idStatus: "normal", completeness: 100, lastChange: "调岗", phone: "188****9092", syncStatus: "synced", lastSyncAt: "2025-04-15 16:45", diffs: [] },
+  { id: "E007", name: "赵强", status: "active", entity: ENTITY, department: "光学装配车间", position: "装配技师", hireDate: "2019-04-08", contractEnd: "2026-04-07", contractStatus: "normal", idEnd: "2025-11-20", idStatus: "soon", completeness: 80, lastChange: "续签", phone: "135****4471", syncStatus: "failed", lastSyncAt: "2025-04-15 10:12", diffs: [] },
+  { id: "E008", name: "周敏", status: "active", entity: ENTITY, department: "财务部", position: "会计主管", hireDate: "2018-09-12", contractEnd: "2027-09-11", contractStatus: "normal", idEnd: "2033-05-04", idStatus: "normal", completeness: 100, lastChange: "—", phone: "131****0908", syncStatus: "synced", lastSyncAt: "2025-04-16 09:00", diffs: [] },
 ];
 
 const stats = [
+  { key: "sync", label: "待同步钉钉", value: MOCK.filter(m => m.syncStatus === "pending" || m.syncStatus === "diff" || m.syncStatus === "failed").length, icon: CloudUpload, accent: "text-primary bg-primary/10", primary: true },
   { key: "contract", label: "合同30天内到期", value: 3, icon: FileWarning, accent: "text-destructive bg-destructive/10" },
   { key: "id", label: "身份证30天内到期", value: 2, icon: IdCard, accent: "text-warning bg-warning/10" },
-  { key: "missing", label: "待补资料", value: 5, icon: Users, accent: "text-primary bg-primary/10" },
-  { key: "sync", label: "待同步钉钉", value: 4, icon: RefreshCcw, accent: "text-muted-foreground bg-muted" },
+  { key: "missing", label: "资料缺失", value: MOCK.filter(m => m.completeness < 100).length, icon: AlertTriangle, accent: "text-muted-foreground bg-muted" },
 ];
 
 const StatusBadge = ({ status }: { status: EmployeeStatus }) => {
@@ -105,36 +126,47 @@ const StatusBadge = ({ status }: { status: EmployeeStatus }) => {
   return <Badge variant="outline" className={cn("font-normal", map[status].cls)}>{map[status].label}</Badge>;
 };
 
-const ContractCell = ({ status, date }: { status: ContractStatus; date: string }) => {
-  if (status === "expired")
-    return <span className="inline-flex items-center gap-1 text-destructive"><AlertTriangle className="h-3.5 w-3.5" />已到期</span>;
-  if (status === "soon")
-    return <span className="inline-flex items-center gap-1 text-warning"><AlertTriangle className="h-3.5 w-3.5" />即将到期</span>;
-  return <span className="text-success">正常</span>;
-};
+function SyncBadge({ status, time, diffs }: { status: SyncStatus; time: string; diffs: number }) {
+  const map: Record<SyncStatus, { label: string; cls: string; dot: string }> = {
+    synced: { label: "已同步", cls: "text-success", dot: "bg-success" },
+    pending: { label: "待同步", cls: "text-muted-foreground", dot: "bg-muted-foreground" },
+    diff: { label: `${diffs} 项差异`, cls: "text-warning", dot: "bg-warning" },
+    failed: { label: "同步失败", cls: "text-destructive", dot: "bg-destructive" },
+  };
+  const m = map[status];
+  return (
+    <div className="flex flex-col gap-0.5 min-w-[110px]">
+      <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium", m.cls)}>
+        <span className={cn("h-1.5 w-1.5 rounded-full", m.dot)} />
+        {m.label}
+      </span>
+      <span className="text-[11px] text-muted-foreground tabular-nums">{time}</span>
+    </div>
+  );
+}
 
-const IdCell = ({ status }: { status: IdStatus }) => {
-  if (status === "expired")
-    return <span className="inline-flex items-center gap-1 text-destructive"><AlertTriangle className="h-3.5 w-3.5" />已到期</span>;
-  if (status === "soon")
-    return <span className="inline-flex items-center gap-1 text-warning"><AlertTriangle className="h-3.5 w-3.5" />即将到期</span>;
-  return <span className="text-success">正常</span>;
+const ContractCell = ({ status }: { status: ContractStatus }) => {
+  if (status === "expired") return <span className="inline-flex items-center gap-1 text-destructive text-xs"><AlertTriangle className="h-3 w-3" />已到期</span>;
+  if (status === "soon") return <span className="inline-flex items-center gap-1 text-warning text-xs"><AlertTriangle className="h-3 w-3" />即将到期</span>;
+  return <span className="text-success text-xs">正常</span>;
+};
+const IdCellC = ({ status }: { status: IdStatus }) => {
+  if (status === "expired") return <span className="inline-flex items-center gap-1 text-destructive text-xs"><AlertTriangle className="h-3 w-3" />已到期</span>;
+  if (status === "soon") return <span className="inline-flex items-center gap-1 text-warning text-xs"><AlertTriangle className="h-3 w-3" />即将到期</span>;
+  return <span className="text-success text-xs">正常</span>;
 };
 
 export default function Employees() {
   const [tab, setTab] = useState("list");
   const [keyword, setKeyword] = useState("");
   const [department, setDepartment] = useState<string>("all");
+  const [syncFilter, setSyncFilter] = useState<string>("all");
   const [contractFilter, setContractFilter] = useState<string>("all");
-  const [completenessFilter, setCompletenessFilter] = useState<string>("all");
   const [statFilter, setStatFilter] = useState<string | null>(null);
-  const [importOpen, setImportOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
+  const [diffOpen, setDiffOpen] = useState<EmployeeRow | null>(null);
 
-  const departments = useMemo(
-    () => Array.from(new Set(MOCK.map((m) => m.department))),
-    []
-  );
+  const departments = useMemo(() => Array.from(new Set(MOCK.map((m) => m.department))), []);
 
   const filtered = useMemo(() => {
     return MOCK.filter((r) => {
@@ -143,45 +175,67 @@ export default function Employees() {
         if (![r.name, r.phone, r.department, r.position].some((v) => v.toLowerCase().includes(k))) return false;
       }
       if (department !== "all" && r.department !== department) return false;
+      if (syncFilter !== "all" && r.syncStatus !== syncFilter) return false;
       if (contractFilter !== "all" && r.contractStatus !== contractFilter) return false;
-      if (completenessFilter === "complete" && r.completeness < 100) return false;
-      if (completenessFilter === "missing" && r.completeness >= 100) return false;
       if (statFilter === "contract" && r.contractStatus === "normal") return false;
       if (statFilter === "id" && r.idStatus === "normal") return false;
       if (statFilter === "missing" && r.completeness >= 100) return false;
+      if (statFilter === "sync" && r.syncStatus === "synced") return false;
       return true;
     });
-  }, [keyword, department, contractFilter, completenessFilter, statFilter]);
+  }, [keyword, department, syncFilter, contractFilter, statFilter]);
 
-  const toggleAll = (checked: boolean) => {
-    setSelected(checked ? filtered.map((r) => r.id) : []);
-  };
-  const toggleOne = (id: string) => {
-    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
-  };
+  const toggleAll = (checked: boolean) => setSelected(checked ? filtered.map((r) => r.id) : []);
+  const toggleOne = (id: string) => setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+
+  const lastFullSync = "2025-04-16 14:21";
+  const pendingCount = MOCK.filter(m => m.syncStatus !== "synced").length;
 
   return (
     <>
       <PageHeader
         title="员工档案管理"
-        description="武汉三工光电 · 统一管理在职员工主数据、证件、合同与异动"
+        description="武汉三工光电 · 钉钉为主数据源，本系统负责双向同步、风险校验与档案留痕"
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={() => toast.success("已触发数据同步")}>
-              <RefreshCcw className="h-4 w-4 mr-1.5" />数据同步
+            <Button variant="outline" size="sm" onClick={() => toast.success("正在拉取钉钉员工信息…")}>
+              <RefreshCcw className="h-4 w-4 mr-1.5" />从钉钉拉取
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
-              <Upload className="h-4 w-4 mr-1.5" />导入资料
+            <Button size="sm" onClick={() => toast.success(`已推送 ${pendingCount} 名员工到钉钉`)}>
+              <CloudUpload className="h-4 w-4 mr-1.5" />批量推送钉钉
             </Button>
             <Button variant="outline" size="sm" onClick={() => toast.success(`已导出 ${filtered.length} 条`)}>
-              <Download className="h-4 w-4 mr-1.5" />批量导出
+              <Download className="h-4 w-4 mr-1.5" />导出
             </Button>
           </>
         }
       />
 
       <div className="p-6 space-y-5">
-        {/* 顶部 4 个统计卡 */}
+        {/* 同步状态横幅 */}
+        <Card className="p-4 bg-gradient-to-r from-primary/5 to-transparent border-primary/20">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <ArrowUpDown className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <div className="text-sm font-medium">钉钉双向同步</div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                上次全量同步 <span className="tabular-nums">{lastFullSync}</span> · 当前 <span className="text-warning font-medium">{pendingCount}</span> 名员工待处理
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => { setStatFilter("sync"); toast.info("已筛选待处理员工"); }}>
+                查看待处理
+              </Button>
+              <Button size="sm" onClick={() => toast.success("已触发全量同步")}>
+                <RefreshCcw className="h-4 w-4 mr-1.5" />立即同步
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* 4 张统计卡 */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((s) => {
             const active = statFilter === s.key;
@@ -192,6 +246,7 @@ export default function Employees() {
                 onClick={() => setStatFilter(active ? null : s.key)}
                 className={cn(
                   "p-4 cursor-pointer transition-all hover:shadow-md flex items-center gap-3",
+                  s.primary && "border-primary/30",
                   active && "ring-2 ring-primary"
                 )}
               >
@@ -224,27 +279,36 @@ export default function Employees() {
           </TabsList>
 
           <TabsContent value="list" className="space-y-4">
-            {/* 筛选栏 */}
             <Card className="p-4">
               <div className="flex flex-wrap items-center gap-2">
                 <div className="relative flex-1 min-w-[240px]">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="搜索姓名、手机号、身份证号、部门…"
+                    placeholder="搜索姓名、手机号、部门、职务…"
                     className="pl-9"
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
                   />
                 </div>
+                <Select value={syncFilter} onValueChange={setSyncFilter}>
+                  <SelectTrigger className="w-[150px]"><SelectValue placeholder="同步状态" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部同步状态</SelectItem>
+                    <SelectItem value="synced">已同步</SelectItem>
+                    <SelectItem value="diff">有差异</SelectItem>
+                    <SelectItem value="pending">待同步</SelectItem>
+                    <SelectItem value="failed">同步失败</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Select value={department} onValueChange={setDepartment}>
-                  <SelectTrigger className="w-[180px]"><SelectValue placeholder="部门" /></SelectTrigger>
+                  <SelectTrigger className="w-[160px]"><SelectValue placeholder="部门" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">全部部门</SelectItem>
                     {departments.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={contractFilter} onValueChange={setContractFilter}>
-                  <SelectTrigger className="w-[160px]"><SelectValue placeholder="合同状态" /></SelectTrigger>
+                  <SelectTrigger className="w-[140px]"><SelectValue placeholder="合同状态" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">全部合同</SelectItem>
                     <SelectItem value="normal">正常</SelectItem>
@@ -252,15 +316,7 @@ export default function Employees() {
                     <SelectItem value="expired">已到期</SelectItem>
                   </SelectContent>
                 </Select>
-                <Select value={completenessFilter} onValueChange={setCompletenessFilter}>
-                  <SelectTrigger className="w-[160px]"><SelectValue placeholder="资料完整度" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全部</SelectItem>
-                    <SelectItem value="complete">完整</SelectItem>
-                    <SelectItem value="missing">有缺失</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button variant="outline" size="sm" onClick={() => { setKeyword(""); setDepartment("all"); setContractFilter("all"); setCompletenessFilter("all"); setStatFilter(null); }}>
+                <Button variant="outline" size="sm" onClick={() => { setKeyword(""); setDepartment("all"); setSyncFilter("all"); setContractFilter("all"); setStatFilter(null); }}>
                   <Filter className="h-4 w-4 mr-1.5" />重置
                 </Button>
               </div>
@@ -270,14 +326,14 @@ export default function Employees() {
                   <CheckCircle2 className="h-4 w-4 text-primary" />
                   已选 <span className="font-medium">{selected.length}</span> 名员工
                   <div className="flex-1" />
+                  <Button size="sm" variant="outline" onClick={() => toast.success("已接受钉钉变更")}>接受钉钉变更</Button>
+                  <Button size="sm" variant="outline" onClick={() => toast.success("已推送到钉钉")}>推送到钉钉</Button>
                   <Button size="sm" variant="outline" onClick={() => toast.success("提醒已发送")}>提醒补资料</Button>
-                  <Button size="sm" variant="outline" onClick={() => toast.success("已加入钉钉同步队列")}>同步钉钉</Button>
                   <Button size="sm" variant="ghost" onClick={() => setSelected([])}>取消</Button>
                 </div>
               )}
             </Card>
 
-            {/* 表格 */}
             <Card className="overflow-hidden">
               <Table>
                 <TableHeader>
@@ -291,15 +347,14 @@ export default function Employees() {
                       />
                     </TableHead>
                     <TableHead>姓名</TableHead>
-                    <TableHead>员工状态</TableHead>
-                    <TableHead>合同归属</TableHead>
+                    <TableHead>状态</TableHead>
                     <TableHead>部门</TableHead>
                     <TableHead>现任职务</TableHead>
                     <TableHead>入职时间</TableHead>
-                    <TableHead>合同到期</TableHead>
-                    <TableHead>身份证到期</TableHead>
-                    <TableHead>资料完整度</TableHead>
-                    <TableHead>最新变动</TableHead>
+                    <TableHead>钉钉同步</TableHead>
+                    <TableHead>合同</TableHead>
+                    <TableHead>身份证</TableHead>
+                    <TableHead>资料</TableHead>
                     <TableHead className="w-10"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -315,24 +370,39 @@ export default function Employees() {
                         />
                       </TableCell>
                       <TableCell>
-                        <Link to={`/employees/${r.id}`} className="font-medium text-foreground hover:text-primary">{r.name}</Link>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Link to={`/employees/${r.id}`} className="font-medium hover:text-primary">{r.name}</Link>
+                          </TooltipTrigger>
+                          <TooltipContent>最近变动：{r.lastChange}</TooltipContent>
+                        </Tooltip>
                       </TableCell>
                       <TableCell><StatusBadge status={r.status} /></TableCell>
-                      <TableCell className="max-w-[160px] truncate text-muted-foreground" title={r.entity}>{r.entity}</TableCell>
-                      <TableCell>{r.department}</TableCell>
-                      <TableCell>{r.position}</TableCell>
-                      <TableCell className="text-muted-foreground">{r.hireDate}</TableCell>
-                      <TableCell><ContractCell status={r.contractStatus} date={r.contractEnd} /></TableCell>
-                      <TableCell><IdCell status={r.idStatus} /></TableCell>
+                      <TableCell className="text-sm">{r.department}</TableCell>
+                      <TableCell className="text-sm">{r.position}</TableCell>
+                      <TableCell className="text-muted-foreground text-sm tabular-nums">{r.hireDate}</TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2 min-w-[120px]">
+                        {r.syncStatus === "diff" ? (
+                          <button
+                            onClick={() => setDiffOpen(r)}
+                            className="text-left hover:bg-warning/5 rounded px-1 -mx-1 transition-colors"
+                          >
+                            <SyncBadge status={r.syncStatus} time={r.lastSyncAt} diffs={r.diffs.length} />
+                          </button>
+                        ) : (
+                          <SyncBadge status={r.syncStatus} time={r.lastSyncAt} diffs={r.diffs.length} />
+                        )}
+                      </TableCell>
+                      <TableCell><ContractCell status={r.contractStatus} /></TableCell>
+                      <TableCell><IdCellC status={r.idStatus} /></TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 min-w-[100px]">
                           <Progress value={r.completeness} className="h-1.5 flex-1" />
                           <span className={cn("text-xs tabular-nums", r.completeness < 100 ? "text-warning" : "text-success")}>
                             {r.completeness}%
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="max-w-[160px] truncate text-muted-foreground" title={r.lastChange}>{r.lastChange}</TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -340,16 +410,28 @@ export default function Employees() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild><Link to={`/employees/${r.id}`}>查看详情</Link></DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => toast.success("已发起调岗")}>发起调岗</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => toast.success("已发起离职流程")}>发起离职</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => toast.success("已同步钉钉")}>同步钉钉</DropdownMenuItem>
+                            {r.diffs.length > 0 && (
+                              <DropdownMenuItem onClick={() => setDiffOpen(r)}>
+                                <GitCompare className="h-4 w-4 mr-2" />查看差异
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem onClick={() => toast.success("已从钉钉拉取最新")}>
+                              <RefreshCcw className="h-4 w-4 mr-2" />从钉钉拉取
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toast.success("已推送到钉钉")}>
+                              <CloudUpload className="h-4 w-4 mr-2" />推送到钉钉
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => toast.success("已打开附件上传")}>
+                              <Paperclip className="h-4 w-4 mr-2" />补录附件
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))}
                   {filtered.length === 0 && (
-                    <TableRow><TableCell colSpan={12} className="text-center text-muted-foreground py-10">没有匹配的员工</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={11} className="text-center text-muted-foreground py-10">没有匹配的员工</TableCell></TableRow>
                   )}
                 </TableBody>
               </Table>
@@ -360,19 +442,21 @@ export default function Employees() {
             <Card className="p-6">
               <div className="space-y-4">
                 {[
-                  { date: "2025-04-15", name: "黄磊", type: "调岗", desc: "产品部 → 产品总监", op: "李 HR" },
-                  { date: "2025-04-10", name: "陈静", type: "入职", desc: "技术研发中心 · 后端开发", op: "李 HR" },
-                  { date: "2025-04-02", name: "王芳", type: "续签", desc: "合同续签至 2025-12-30", op: "周主管" },
-                  { date: "2025-03-28", name: "刘洋", type: "转正", desc: "实习 → 正式", op: "李 HR" },
+                  { date: "2025-04-16 14:21", name: "王芳", type: "钉钉变更", desc: "部门：市场部 → 市场部 / 品牌组（钉钉同步触发）", op: "钉钉" },
+                  { date: "2025-04-15 16:45", name: "黄磊", type: "调岗", desc: "产品部 → 产品总监（本系统下推钉钉）", op: "李 HR" },
+                  { date: "2025-04-14 11:08", name: "张伟", type: "钉钉变更", desc: "现任职务：销售主管 → 销售总监", op: "钉钉" },
+                  { date: "2025-04-10 09:00", name: "陈静", type: "入职", desc: "技术研发中心 · 后端开发（钉钉新建）", op: "钉钉" },
                 ].map((c, i) => (
                   <div key={i} className="flex items-start gap-4 border-l-2 border-primary/30 pl-4">
-                    <div className="text-xs text-muted-foreground w-24 shrink-0 mt-0.5 tabular-nums">{c.date}</div>
+                    <div className="text-xs text-muted-foreground w-32 shrink-0 mt-0.5 tabular-nums">{c.date}</div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{c.name}</span>
-                        <Badge variant="secondary">{c.type}</Badge>
+                        <Badge variant={c.op === "钉钉" ? "default" : "secondary"} className={c.op === "钉钉" ? "bg-primary/10 text-primary hover:bg-primary/15" : ""}>
+                          {c.type}
+                        </Badge>
                       </div>
-                      <div className="text-sm text-muted-foreground mt-1">{c.desc} · 操作人 {c.op}</div>
+                      <div className="text-sm text-muted-foreground mt-1">{c.desc} · 来源 {c.op}</div>
                     </div>
                   </div>
                 ))}
@@ -401,7 +485,9 @@ export default function Employees() {
                       )}
                     </div>
                     <div className="mt-3 flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => toast.success("已发送提醒")}>提醒员工</Button>
+                      <Button size="sm" variant="outline" onClick={() => toast.success("已通过钉钉发送提醒")}>
+                        <CircleDot className="h-3.5 w-3.5 mr-1" />钉钉提醒员工
+                      </Button>
                       <Button size="sm" variant="outline" onClick={() => toast.success("已发起续签")}>发起续签</Button>
                     </div>
                   </Card>
@@ -412,127 +498,95 @@ export default function Employees() {
         </Tabs>
       </div>
 
-      {/* 导入资料弹窗 */}
-      <ImportDialog open={importOpen} onOpenChange={setImportOpen} />
+      {/* 字段差异抽屉 */}
+      <DiffSheet row={diffOpen} onClose={() => setDiffOpen(null)} />
     </>
   );
 }
 
-function ImportDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
-  const [step, setStep] = useState(1);
-  const [file, setFile] = useState<string | null>(null);
+function DiffSheet({ row, onClose }: { row: EmployeeRow | null; onClose: () => void }) {
+  const [decisions, setDecisions] = useState<Record<string, "accept" | "reject" | undefined>>({});
 
-  const handleStart = () => {
-    if (!file) { toast.error("请先上传文件"); return; }
-    toast.success("AI 识别中…");
-    setTimeout(() => setStep(2), 800);
+  if (!row) return null;
+
+  const handleDecision = (field: string, d: "accept" | "reject") => {
+    setDecisions((s) => ({ ...s, [field]: d }));
   };
 
-  const handleConfirm = () => {
-    toast.success("已生成员工档案");
-    setStep(3);
-    setTimeout(() => { onOpenChange(false); setStep(1); setFile(null); }, 1200);
+  const handleApply = () => {
+    const accepted = row.diffs.filter((d) => decisions[d.field] === "accept").length;
+    toast.success(`已接受 ${accepted} 项钉钉变更，并写入档案`);
+    onClose();
+    setDecisions({});
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setStep(1); setFile(null); } }}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>导入资料</DialogTitle>
-          <DialogDescription>上传身份证、学历证明、合同、简历等，AI 自动识别并生成员工档案</DialogDescription>
-        </DialogHeader>
+    <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent className="w-[480px] sm:max-w-[480px]">
+        <SheetHeader>
+          <SheetTitle className="flex items-center gap-2">
+            <GitCompare className="h-5 w-5 text-warning" />
+            {row.name} · 字段差异核对
+          </SheetTitle>
+          <SheetDescription>
+            钉钉于 <span className="tabular-nums">{row.lastSyncAt}</span> 推送了变更，请逐项确认是否写入员工档案。
+          </SheetDescription>
+        </SheetHeader>
 
-        {/* steps */}
-        <div className="flex items-center gap-2 text-sm">
-          {[
-            { n: 1, t: "上传资料" },
-            { n: 2, t: "确认信息" },
-            { n: 3, t: "完成建档" },
-          ].map((s, i) => (
-            <div key={s.n} className="flex items-center gap-2">
-              <div className={cn("h-6 w-6 rounded-full flex items-center justify-center text-xs font-medium",
-                step >= s.n ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-              )}>{s.n}</div>
-              <span className={step >= s.n ? "text-foreground" : "text-muted-foreground"}>{s.t}</span>
-              {i < 2 && <div className="w-8 h-px bg-border mx-1" />}
-            </div>
-          ))}
+        <div className="mt-6 space-y-3">
+          {row.diffs.map((d) => {
+            const dec = decisions[d.field];
+            return (
+              <Card key={d.field} className={cn(
+                "p-4 transition-colors",
+                dec === "accept" && "border-success/40 bg-success/5",
+                dec === "reject" && "border-muted bg-muted/30 opacity-70"
+              )}>
+                <div className="text-sm font-medium mb-3">{d.field}</div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="rounded-md border border-primary/30 bg-primary/5 p-2.5">
+                    <div className="text-[10px] text-primary mb-1 uppercase tracking-wide">钉钉值</div>
+                    <div className="font-medium">{d.dingtalk}</div>
+                  </div>
+                  <div className="rounded-md border bg-muted/40 p-2.5">
+                    <div className="text-[10px] text-muted-foreground mb-1 uppercase tracking-wide">系统值</div>
+                    <div className="font-medium">{d.system}</div>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <Button
+                    size="sm"
+                    variant={dec === "accept" ? "default" : "outline"}
+                    className="flex-1"
+                    onClick={() => handleDecision(d.field, "accept")}
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 mr-1" />采用钉钉值
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={dec === "reject" ? "secondary" : "outline"}
+                    className="flex-1"
+                    onClick={() => handleDecision(d.field, "reject")}
+                  >
+                    保留系统值
+                  </Button>
+                </div>
+              </Card>
+            );
+          })}
         </div>
 
-        {step === 1 && (
-          <div className="grid md:grid-cols-[1fr_240px] gap-4">
-            <label className="border-2 border-dashed border-border rounded-lg p-10 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors">
-              <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
-              <div className="mt-3 font-medium">点击或拖拽文件到此处上传</div>
-              <div className="text-xs text-muted-foreground mt-1">支持 JPG、PNG、PDF，单个不超过 10MB</div>
-              {file && <div className="mt-3 text-sm text-primary">已选择：{file}</div>}
-              <input
-                type="file"
-                className="hidden"
-                onChange={(e) => setFile(e.target.files?.[0]?.name ?? null)}
-              />
-            </label>
-            <Card className="p-4 bg-muted/30">
-              <div className="font-medium text-sm mb-2">上传提示</div>
-              <ol className="text-xs text-muted-foreground space-y-2 list-decimal list-inside">
-                <li>身份证正反面清晰可见，无遮挡反光</li>
-                <li>学历证明需含姓名、学校、专业、毕业时间</li>
-                <li>合同需清晰显示签约双方、期限</li>
-                <li>简历格式不限，PDF 或图片均可</li>
-              </ol>
-            </Card>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-3">
-            <div className="text-sm text-muted-foreground inline-flex items-center gap-1">
-              <Sparkles className="h-4 w-4 text-primary" /> AI 已识别 12 个字段，2 个建议人工确认
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                ["姓名", "张三", true],
-                ["性别", "男", true],
-                ["身份证号", "420106199x********", true],
-                ["手机号", "138****6612", false],
-                ["学历", "本科", true],
-                ["毕业院校", "华中科技大学", true],
-              ].map(([k, v, ok]) => (
-                <div key={k as string} className="flex items-center justify-between border rounded-md px-3 py-2 text-sm">
-                  <span className="text-muted-foreground">{k}</span>
-                  <span className="flex items-center gap-1.5">
-                    {v}
-                    {ok ? <CheckCircle2 className="h-3.5 w-3.5 text-success" /> : <AlertTriangle className="h-3.5 w-3.5 text-warning" />}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="py-8 text-center">
-            <CheckCircle2 className="h-12 w-12 text-success mx-auto" />
-            <div className="mt-3 font-medium">档案已生成</div>
-            <div className="text-sm text-muted-foreground mt-1">已加入待同步钉钉队列</div>
-          </div>
-        )}
-
-        <DialogFooter>
-          {step === 1 && (
-            <>
-              <Button variant="outline" onClick={() => onOpenChange(false)}>取消</Button>
-              <Button onClick={handleStart}><Sparkles className="h-4 w-4 mr-1.5" />开始识别</Button>
-            </>
-          )}
-          {step === 2 && (
-            <>
-              <Button variant="outline" onClick={() => setStep(1)}>上一步</Button>
-              <Button onClick={handleConfirm}>确认并建档</Button>
-            </>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-background flex gap-2">
+          <Button variant="outline" className="flex-1" onClick={onClose}>稍后处理</Button>
+          <Button
+            className="flex-1"
+            disabled={Object.keys(decisions).length === 0}
+            onClick={handleApply}
+          >
+            应用变更
+          </Button>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
