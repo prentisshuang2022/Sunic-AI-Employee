@@ -397,21 +397,6 @@ export default function Training() {
           </div>
         </div>
 
-        {/* Footer 状态条 */}
-        <Card className="p-4 flex items-center gap-4">
-          <div className="h-10 w-10 rounded-lg bg-foreground text-primary flex items-center justify-center font-bold">
-            <GraduationCap className="h-5 w-5" />
-          </div>
-          <div className="flex-1">
-            <div className="text-sm font-semibold">培训助手 · v0.6</div>
-            <div className="text-[11px] text-muted-foreground mt-0.5">数据贯通 · 钉钉 / 花名册 / 考勤 / 绩效 · 服务三工光电集团 208 名员工</div>
-          </div>
-          <div className="hidden md:flex gap-5 font-mono text-[10px] text-muted-foreground tracking-wider">
-            <div>LAST SYNC · <span className="text-foreground font-medium">2 MIN AGO</span></div>
-            <div>DINGTALK · <span className="text-success font-medium">CONNECTED</span></div>
-            <div>AI MODEL · <span className="text-foreground font-medium">LOVABLE AI</span></div>
-          </div>
-        </Card>
       </div>
 
       <NewExamDialog open={examOpen} onClose={() => setExamOpen(false)} />
