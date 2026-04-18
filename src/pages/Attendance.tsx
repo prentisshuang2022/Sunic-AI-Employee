@@ -509,6 +509,7 @@ function ExceptionsPanel() {
 // ---------- 加班 / 调休 Tab ----------
 
 function OvertimePanel() {
+  const [dateFilter, setDateFilter] = useState<DateFilterValue>({ preset: "today" });
   const [deptFilter, setDeptFilter] = useState<string>("智能部门");
   const [statusFilter, setStatusFilter] = useState<string>("pending");
   const [uploadOpen, setUploadOpen] = useState(false);
