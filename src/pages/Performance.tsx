@@ -12,14 +12,18 @@ import {
   Gauge,
   LineChart,
   MessagesSquare,
+  Pencil,
   Plus,
+  Save,
   Search,
   Sparkles,
   Target,
+  Trash2,
   TrendingDown,
   TrendingUp,
   Users,
   Wand2,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
