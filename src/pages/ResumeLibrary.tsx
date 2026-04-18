@@ -15,7 +15,7 @@ import {
   CheckCircle2,
   Loader2,
 } from "lucide-react";
-import { PageHeader } from "@/components/layout/PageHeader";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -228,7 +228,7 @@ const statusStyle: Record<ParseStatus, string> = {
   解析失败: "bg-danger-soft text-[hsl(var(--danger))] border-[hsl(var(--danger)/0.3)]",
 };
 
-export default function ResumeLibrary() {
+export function ResumeLibraryPanel() {
   const [keyword, setKeyword] = useState("");
   const [education, setEducation] = useState("all");
   const [city, setCity] = useState("all");
@@ -275,27 +275,17 @@ export default function ResumeLibrary() {
   const opened = resumes.find((r) => r.id === openId);
 
   return (
-    <div className="flex flex-col">
-      <PageHeader
-        title="简历库"
-        description="人事统一上传简历，AI 自动解析提取关键信息，构建可复用的候选人池"
-        backTo="/recruiting"
-        backLabel="返回招聘需求池"
-        actions={
-          <>
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4" />
-              批量导出
-            </Button>
-            <Button size="sm" onClick={() => setUploadOpen(true)}>
-              <Upload className="h-4 w-4" />
-              上传简历
-            </Button>
-          </>
-        }
-      />
+    <>
+      <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
+        <Button variant="outline" size="sm">
+          <Download className="h-4 w-4" />批量导出
+        </Button>
+        <Button size="sm" onClick={() => setUploadOpen(true)}>
+          <Upload className="h-4 w-4" />上传简历
+        </Button>
+      </div>
 
-      <div className="space-y-4 p-6">
+      <div className="space-y-4">
         {/* 统计 */}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           <StatTile label="简历总数" value={resumes.length} icon={FileText} tone="primary" />
@@ -593,7 +583,7 @@ export default function ResumeLibrary() {
           )}
         </SheetContent>
       </Sheet>
-    </div>
+    </>
   );
 }
 
