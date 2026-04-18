@@ -9,9 +9,9 @@ import {
   ClipboardCheck,
   MessageSquarePlus,
   History,
-  Sparkles,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
+import logoUrl from "@/assets/logo.png";
 
 import {
   Sidebar,
@@ -74,8 +74,8 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader className="border-b">
         <div className="flex items-center gap-2 px-2 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-            <Sparkles className="h-4 w-4" />
+          <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-md bg-white">
+            <img src={logoUrl} alt="Logo" className="h-full w-full object-contain" />
           </div>
           {!collapsed && (
             <div className="flex flex-col leading-tight">
