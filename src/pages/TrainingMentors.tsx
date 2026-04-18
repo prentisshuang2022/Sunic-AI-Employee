@@ -153,7 +153,7 @@ export default function TrainingMentors() {
             <Button size="sm" onClick={() => toast.success("AI 已根据岗位与厂区匹配出 3 位候选导师")}>
               <Sparkles className="h-4 w-4 mr-1.5" />智能匹配导师
             </Button>
-            <Button variant="outline" size="sm" onClick={() => toast.info("打开导师认证申请表")}>
+            <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
               <Plus className="h-4 w-4 mr-1.5" />新增导师
             </Button>
           </>
@@ -221,13 +221,13 @@ export default function TrainingMentors() {
           <div className="mt-3 pt-3 border-t flex items-center justify-between">
             <Tabs value={tab} onValueChange={setTab}>
               <TabsList className="h-7">
-                <TabsTrigger value="all" className="text-xs h-5 px-2.5">全部 {MENTORS.length}</TabsTrigger>
+                <TabsTrigger value="all" className="text-xs h-5 px-2.5">全部 {mentors.length}</TabsTrigger>
                 <TabsTrigger value="gold" className="text-xs h-5 px-2.5">金牌导师</TabsTrigger>
                 <TabsTrigger value="available" className="text-xs h-5 px-2.5">可接收</TabsTrigger>
                 <TabsTrigger value="full" className="text-xs h-5 px-2.5">已满员</TabsTrigger>
               </TabsList>
             </Tabs>
-            <span className="text-[11px] text-muted-foreground font-mono">命中 {filtered.length} / {MENTORS.length}</span>
+            <span className="text-[11px] text-muted-foreground font-mono">命中 {filtered.length} / {mentors.length}</span>
           </div>
         </Card>
 
@@ -246,6 +246,8 @@ export default function TrainingMentors() {
           {selected && <MentorDetail mentor={selected} />}
         </SheetContent>
       </Sheet>
+
+      <AddMentorDialog open={addOpen} onClose={() => setAddOpen(false)} onSubmit={handleAdd} />
     </>
   );
 }
