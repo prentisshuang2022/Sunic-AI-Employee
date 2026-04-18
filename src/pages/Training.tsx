@@ -34,6 +34,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { NewExamDialog } from "@/components/training/NewExamDialog";
 
 const KPIS = [
   { label: "本月考试场次", value: "24", unit: "场", trend: "↑ 18% 环比", trendKind: "up" as const, icon: ClipboardCheck, foot: "脱岗 18 场 · 在岗抽测 6 场", accent: "primary" },
@@ -122,6 +123,7 @@ const chipMap = {
 export default function Training() {
   const [taskFilter, setTaskFilter] = useState("all");
   const [chatInput, setChatInput] = useState("");
+  const [examOpen, setExamOpen] = useState(false);
 
   return (
     <>
@@ -130,13 +132,13 @@ export default function Training() {
         description="脱岗培训 · 在岗培训 · 题库沉淀 · 自动出卷 / 批改 / 节点推进"
         actions={
           <>
-            <Button size="sm" onClick={() => toast.success("已启动 AI 出卷向导")}>
+            <Button size="sm" onClick={() => setExamOpen(true)}>
               <Sparkles className="h-4 w-4 mr-1.5" />AI 一键出卷
             </Button>
             <Button variant="outline" size="sm" onClick={() => toast.success("已打开材料导入")}>
               <FileUp className="h-4 w-4 mr-1.5" />导入培训材料
             </Button>
-            <Button variant="outline" size="sm" onClick={() => toast.success("已发起新一轮考试")}>
+            <Button variant="outline" size="sm" onClick={() => setExamOpen(true)}>
               <Plus className="h-4 w-4 mr-1.5" />发起新考试
             </Button>
           </>
@@ -457,6 +459,8 @@ export default function Training() {
           </div>
         </Card>
       </div>
+
+      <NewExamDialog open={examOpen} onClose={() => setExamOpen(false)} />
     </>
   );
 }
