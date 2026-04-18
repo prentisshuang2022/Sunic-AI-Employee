@@ -228,7 +228,7 @@ const statusStyle: Record<ParseStatus, string> = {
   解析失败: "bg-danger-soft text-[hsl(var(--danger))] border-[hsl(var(--danger)/0.3)]",
 };
 
-export default function ResumeLibrary() {
+export function ResumeLibraryPanel() {
   const [keyword, setKeyword] = useState("");
   const [education, setEducation] = useState("all");
   const [city, setCity] = useState("all");
