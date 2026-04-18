@@ -40,37 +40,54 @@ interface FieldMeta {
 }
 
 const EMP = {
+  // 组织任职
   id: "E003",
-  name: "张伟",
-  gender: "男",
-  birth: "1988-06-12",
-  idNumber: "42010619880612****",
-  phone: "137****6612",
-  emergency: "李丽 / 137****1230",
   entity: ENTITY,
+  department: "销售部",
   payroll: "三工光电 · 销售编制",
   formerPayroll: "三工光电 · 市场编制",
-  department: "销售部",
-  position: "销售主管",
   region: "湖北 武汉",
+  name: "张伟",
+  position: "销售主管",
+  hireDate: "2020-05-20",
+  tenure: "4 年 11 个月",
   transferDate: "2024-09-01",
+  // 合同
   contractType: "固定期限劳动合同",
   contractStart: "2023-05-20",
   contractEnd: "2026-05-19",
   contractDays: 395,
-  household: "湖北省武汉市江夏区",
+  formerContractStart: "2020-05-20",
+  formerContractEnd: "2023-05-19",
+  // 基础信息
+  gender: "男",
+  birth: "1988-06-12",
+  age: 36,
+  idNumber: "42010619880612****",
+  idStart: "2015-12-16",
+  idEnd: "2025-12-15",
+  household: "湖北省武汉市江夏区文化大道 ××× 号",
   nation: "汉族",
   origin: "湖北 黄冈",
   political: "中共党员",
   marriage: "已婚已育",
+  // 教育
   education: "本科",
   educationType: "全日制",
   school: "武汉理工大学",
   graduate: "2010-07",
   major: "光电信息工程",
-  hireDate: "2020-05-20",
+  // 联系方式
+  phone: "137****6612",
+  emergencyName: "李丽",
+  emergencyRelation: "配偶",
+  emergencyPhone: "137****1230",
+  // 离职 / 备注
+  leaveDate: "—",
+  leaveReason: "—",
+  remark: "2024 年度销售之星；负责华中区大客户。",
+  // 元信息
   completeness: 75,
-  idEnd: "2025-12-15",
   lastSyncAt: "2025-04-14 11:08",
 };
 
@@ -78,9 +95,10 @@ const FIELD_META: Record<string, FieldMeta> = {
   姓名: { source: "钉钉", syncedAt: "2025-04-14 11:08" },
   性别: { source: "钉钉", syncedAt: "2025-04-14 11:08" },
   出生日期: { source: "AI识别", syncedAt: "2020-05-20 10:00" },
-  身份证号: { source: "AI识别", syncedAt: "2020-05-20 10:00" },
-  手机号: { source: "钉钉", syncedAt: "2025-04-14 11:08" },
+  身份证号码: { source: "AI识别", syncedAt: "2020-05-20 10:00" },
+  联系号码: { source: "钉钉", syncedAt: "2025-04-14 11:08" },
   紧急联系人: { source: "本系统", syncedAt: "2024-09-01 14:00" },
+  紧急联系人电话: { source: "本系统", syncedAt: "2024-09-01 14:00" },
   部门: { source: "钉钉", syncedAt: "2025-04-14 11:08" },
   现任职务: {
     source: "钉钉",
@@ -90,6 +108,7 @@ const FIELD_META: Record<string, FieldMeta> = {
   归属地: { source: "钉钉", syncedAt: "2025-04-14 11:08" },
   合同性质: { source: "AI识别", syncedAt: "2023-05-20 10:00" },
   毕业院校: { source: "AI识别", syncedAt: "2020-05-20 10:00" },
+  户籍住址: { source: "AI识别", syncedAt: "2020-05-20 10:00" },
 };
 
 export default function EmployeeDetail() {
@@ -173,15 +192,15 @@ export default function EmployeeDetail() {
               <Field label="工号" value={EMP.id} />
               <Field label="状态" value={<Badge variant="outline" className="bg-success/10 text-success border-success/20">在职</Badge>} />
               <Field label="入职时间" value={EMP.hireDate} />
+              <Field label="员工司龄" value={<span className="font-medium">{EMP.tenure}</span>} />
+              <Field label="联系号码" value={EMP.phone} meta={FIELD_META["联系号码"]} />
+              <Field label="部门" value={EMP.department} meta={FIELD_META["部门"]} />
+              <Field label="现任职务" value={EMP.position} meta={FIELD_META["现任职务"]} />
               <Field label="资料完整度" value={
                 <span className={cn("font-medium", EMP.completeness < 100 ? "text-warning" : "text-success")}>
                   {EMP.completeness}%
                 </span>
               } />
-              <Field label="手机号" value={EMP.phone} />
-              <Field label="部门" value={EMP.department} />
-              <Field label="现任职务" value={EMP.position} meta={FIELD_META["现任职务"]} />
-              <Field label="归属地" value={EMP.region} />
             </div>
           </div>
 
@@ -199,60 +218,83 @@ export default function EmployeeDetail() {
           )}
         </Card>
 
-        <Tabs defaultValue="basic">
+        <Tabs defaultValue="org">
           <TabsList>
-            <TabsTrigger value="basic">基础信息</TabsTrigger>
             <TabsTrigger value="org">组织任职 {diffCount > 0 && <Badge variant="secondary" className="ml-1.5 h-4 px-1 text-[10px] bg-warning/15 text-warning">{diffCount}</Badge>}</TabsTrigger>
             <TabsTrigger value="contract">雇佣合同</TabsTrigger>
-            <TabsTrigger value="education">身份与教育</TabsTrigger>
+            <TabsTrigger value="basic">基础信息</TabsTrigger>
+            <TabsTrigger value="education">教育背景</TabsTrigger>
+            <TabsTrigger value="contact">联系方式</TabsTrigger>
+            <TabsTrigger value="leave">离职 / 备注</TabsTrigger>
             <TabsTrigger value="files">资料附件</TabsTrigger>
             <TabsTrigger value="history">异动 / 同步记录</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="basic">
-            <SectionCard title="基础信息卡" hint="钉钉为主数据源">
-              <Field label="姓名" value={EMP.name} meta={FIELD_META["姓名"]} hide={diffOnly && !FIELD_META["姓名"].diff} />
-              <Field label="性别" value={EMP.gender} meta={FIELD_META["性别"]} hide={diffOnly && !FIELD_META["性别"].diff} />
-              <Field label="出生日期" value={EMP.birth} meta={FIELD_META["出生日期"]} hide={diffOnly} />
-              <Field label="身份证号" value={
-                <span className="inline-flex items-center gap-1.5">
-                  {EMP.idNumber}
-                  <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-[10px] px-1.5 py-0">即将到期 {EMP.idEnd}</Badge>
-                </span>
-              } meta={FIELD_META["身份证号"]} hide={diffOnly} />
-              <Field label="手机号" value={EMP.phone} meta={FIELD_META["手机号"]} hide={diffOnly && !FIELD_META["手机号"].diff} />
-              <Field label="紧急联系人" value={EMP.emergency} meta={FIELD_META["紧急联系人"]} hide={diffOnly} />
-            </SectionCard>
-          </TabsContent>
-
           <TabsContent value="org">
             <SectionCard title="组织任职信息卡" hint="本卡所有字段以钉钉为准">
-              <Field label="合同归属" value={EMP.entity} hide={diffOnly} />
+              <Field label="合同归属（子公司）" value={EMP.entity} hide={diffOnly} />
+              <Field label="部门" value={EMP.department} meta={FIELD_META["部门"]} hide={diffOnly && !FIELD_META["部门"].diff} />
               <Field label="现用人编制" value={EMP.payroll} hide={diffOnly} />
               <Field label="原用人编制" value={EMP.formerPayroll} hide={diffOnly} />
-              <Field label="部门" value={EMP.department} meta={FIELD_META["部门"]} hide={diffOnly && !FIELD_META["部门"].diff} />
-              <Field label="现任职务" value={EMP.position} meta={FIELD_META["现任职务"]} />
               <Field label="归属地" value={EMP.region} meta={FIELD_META["归属地"]} hide={diffOnly && !FIELD_META["归属地"].diff} />
-              <Field label="最近调岗" value={EMP.transferDate} hide={diffOnly} />
+              <Field label="姓名" value={EMP.name} meta={FIELD_META["姓名"]} hide={diffOnly && !FIELD_META["姓名"].diff} />
+              <Field label="现任职务" value={EMP.position} meta={FIELD_META["现任职务"]} />
+              <Field label="入职时间" value={EMP.hireDate} hide={diffOnly} />
+              <Field label="员工司龄" value={EMP.tenure} hide={diffOnly} />
+              <Field label="调岗时间" value={EMP.transferDate} hide={diffOnly} />
             </SectionCard>
           </TabsContent>
 
           <TabsContent value="contract">
             <SectionCard title="雇佣合同信息卡" hint="本系统维护，可推送到钉钉">
               <Field label="合同性质" value={EMP.contractType} meta={FIELD_META["合同性质"]} />
-              <Field label="现合同起止" value={`${EMP.contractStart} ~ ${EMP.contractEnd}`} />
-              <Field label="到期天数" value={<span className="text-success font-medium">{EMP.contractDays} 天</span>} />
+              <Field label="现合同起止时间" value={`${EMP.contractStart} ~ ${EMP.contractEnd}`} />
+              <Field label="现合同到期时间" value={
+                <span className="inline-flex items-center gap-1.5">
+                  {EMP.contractEnd}
+                  <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-[10px] px-1.5 py-0">
+                    剩 {EMP.contractDays} 天
+                  </Badge>
+                </span>
+              } />
+              <Field label="合同到期天数" value={<span className="text-success font-medium">{EMP.contractDays} 天</span>} />
+              <Field label="原合同起止时间" value={`${EMP.formerContractStart} ~ ${EMP.formerContractEnd}`} />
+              <Field label="原合同到期时间" value={EMP.formerContractEnd} />
+            </SectionCard>
+          </TabsContent>
+
+          <TabsContent value="basic">
+            <SectionCard title="基础信息卡" hint="钉钉为主数据源 + AI 识别身份证">
+              <Field label="姓名" value={EMP.name} meta={FIELD_META["姓名"]} hide={diffOnly && !FIELD_META["姓名"].diff} />
+              <Field label="性别" value={EMP.gender} meta={FIELD_META["性别"]} hide={diffOnly && !FIELD_META["性别"].diff} />
+              <Field label="出生日期" value={EMP.birth} meta={FIELD_META["出生日期"]} hide={diffOnly} />
+              <Field label="员工年龄" value={`${EMP.age} 岁`} hide={diffOnly} />
+              <Field label="身份证号码" value={
+                <span className="inline-flex items-center gap-1.5">
+                  {EMP.idNumber}
+                  <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-[10px] px-1.5 py-0">即将到期</Badge>
+                </span>
+              } meta={FIELD_META["身份证号码"]} hide={diffOnly} />
+              <Field label="身份证起止时间" value={
+                <span className="inline-flex items-center gap-1.5">
+                  {EMP.idStart} ~ {EMP.idEnd}
+                  <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-[10px] px-1.5 py-0">
+                    {EMP.idEnd} 到期
+                  </Badge>
+                </span>
+              } hide={diffOnly} />
+              <Field label="户籍住址" value={EMP.household} meta={FIELD_META["户籍住址"]} hide={diffOnly} />
+              <Field label="民族" value={EMP.nation} hide={diffOnly} />
+              <Field label="籍贯" value={EMP.origin} hide={diffOnly} />
+              <Field label="政治面貌" value={EMP.political} hide={diffOnly} />
+              <Field label="是否婚育" value={EMP.marriage} hide={diffOnly} />
             </SectionCard>
           </TabsContent>
 
           <TabsContent value="education">
-            <SectionCard title="身份与教育信息卡" hint="AI 识别 + 本系统维护">
-              <Field label="户籍住址" value={EMP.household} />
-              <Field label="民族" value={EMP.nation} />
-              <Field label="籍贯" value={EMP.origin} />
-              <Field label="政治面貌" value={EMP.political} />
-              <Field label="婚育情况" value={EMP.marriage} />
+            <SectionCard title="教育背景信息卡" hint="AI 识别学历证书 + 本系统维护">
               <Field label="学历" value={EMP.education} />
+              <Field label="学历类别" value={EMP.educationType} />
               <Field label="毕业院校" value={EMP.school} meta={FIELD_META["毕业院校"]} />
               <Field label="毕业时间" value={EMP.graduate} />
               <Field label="专业" value={EMP.major} />
@@ -264,10 +306,29 @@ export default function EmployeeDetail() {
             </SectionCard>
           </TabsContent>
 
+          <TabsContent value="contact">
+            <SectionCard title="联系方式信息卡" hint="紧急联系人由本系统维护">
+              <Field label="联系号码" value={EMP.phone} meta={FIELD_META["联系号码"]} />
+              <Field label="紧急联系人" value={`${EMP.emergencyName}（${EMP.emergencyRelation}）`} meta={FIELD_META["紧急联系人"]} />
+              <Field label="紧急联系人电话" value={EMP.emergencyPhone} meta={FIELD_META["紧急联系人电话"]} />
+            </SectionCard>
+          </TabsContent>
+
+          <TabsContent value="leave">
+            <SectionCard title="离职 / 备注信息卡" hint="离职信息在发起离职流程后自动写入">
+              <Field label="离职时间" value={<span className="text-muted-foreground">{EMP.leaveDate}</span>} />
+              <Field label="离职原因" value={<span className="text-muted-foreground">{EMP.leaveReason}</span>} />
+              <div className="col-span-full">
+                <div className="text-xs text-muted-foreground mb-1">备注</div>
+                <div className="text-sm rounded-md border bg-muted/30 px-3 py-2 leading-relaxed">{EMP.remark}</div>
+              </div>
+            </SectionCard>
+          </TabsContent>
+
           <TabsContent value="files">
             <Card className="p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-medium">资料附件</h3>
+                <h3 className="font-medium">证件 / 资料附件</h3>
                 <Button size="sm" variant="outline" onClick={() => toast.success("已打开附件上传")}>
                   <Paperclip className="h-3.5 w-3.5 mr-1" />补录附件
                 </Button>
@@ -358,7 +419,7 @@ export default function EmployeeDetail() {
                 </div>
                 <div className="grid md:grid-cols-3 gap-3">
                   {[
-                    { f: "身份证号", from: "身份证.jpg", confidence: 0.99 },
+                    { f: "身份证号码", from: "身份证.jpg", confidence: 0.99 },
                     { f: "毕业院校", from: "学历证明.pdf", confidence: 0.96 },
                     { f: "合同期限", from: "劳动合同.pdf", confidence: 0.92 },
                   ].map((r) => (
