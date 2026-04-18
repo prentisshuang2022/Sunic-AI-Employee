@@ -93,20 +93,22 @@ interface EmployeeRow {
 
 const ENTITY = "武汉三工光电设备制造有限公司";
 
+const ENTITIES = ["光电", "光电（鄂）", "国际", "激光", "新能源", "新能源（鄂）", "其他"] as const;
+
 const MOCK: EmployeeRow[] = [
-  { id: "E001", name: "李明", status: "active", entity: ENTITY, department: "激光技术部", position: "高级激光工程师", hireDate: "2022-03-15", contractEnd: "2026-03-14", contractStatus: "normal", idEnd: "2031-08-12", idStatus: "normal", completeness: 100, lastChange: "转正", phone: "138****2381", syncStatus: "synced", lastSyncAt: "2025-04-15 09:32", diffs: [] },
-  { id: "E002", name: "王芳", status: "active", entity: ENTITY, department: "市场部", position: "市场经理", hireDate: "2021-08-01", contractEnd: "2025-12-30", contractStatus: "soon", idEnd: "2029-04-22", idStatus: "normal", completeness: 100, lastChange: "部门变动", phone: "139****1102", syncStatus: "diff", lastSyncAt: "2025-04-16 14:21", diffs: [
-    { field: "部门", dingtalk: "市场部 / 品牌组", system: "市场部" },
+  { id: "E001", name: "李明", status: "active", entity: "激光", department: "研发部", position: "高级激光工程师", hireDate: "2022-03-15", contractEnd: "2026-03-14", contractStatus: "normal", idEnd: "2031-08-12", idStatus: "normal", completeness: 100, lastChange: "转正", phone: "138****2381", syncStatus: "synced", lastSyncAt: "2025-04-15 09:32", diffs: [] },
+  { id: "E002", name: "王芳", status: "active", entity: "光电", department: "市场营销部", position: "市场经理", hireDate: "2021-08-01", contractEnd: "2025-12-30", contractStatus: "soon", idEnd: "2029-04-22", idStatus: "normal", completeness: 100, lastChange: "部门变动", phone: "139****1102", syncStatus: "diff", lastSyncAt: "2025-04-16 14:21", diffs: [
+    { field: "部门", dingtalk: "市场营销部 / 品牌组", system: "市场营销部" },
     { field: "手机号", dingtalk: "139****1108", system: "139****1102" },
   ]},
-  { id: "E003", name: "张伟", status: "active", entity: ENTITY, department: "销售部", position: "销售主管", hireDate: "2020-05-20", contractEnd: "2026-05-19", contractStatus: "normal", idEnd: "2025-12-15", idStatus: "soon", completeness: 75, lastChange: "岗位变动", phone: "137****6612", syncStatus: "diff", lastSyncAt: "2025-04-14 11:08", diffs: [
+  { id: "E003", name: "张伟", status: "active", entity: "光电（鄂）", department: "商务部", position: "销售主管", hireDate: "2020-05-20", contractEnd: "2026-05-19", contractStatus: "normal", idEnd: "2025-12-15", idStatus: "soon", completeness: 75, lastChange: "岗位变动", phone: "137****6612", syncStatus: "diff", lastSyncAt: "2025-04-14 11:08", diffs: [
     { field: "现任职务", dingtalk: "销售总监", system: "销售主管" },
   ]},
-  { id: "E004", name: "刘洋", status: "active", entity: ENTITY, department: "技术研发中心", position: "前端开发", hireDate: "2023-01-10", contractEnd: "2026-01-09", contractStatus: "normal", idEnd: "2030-09-01", idStatus: "normal", completeness: 100, lastChange: "入职", phone: "186****8821", syncStatus: "synced", lastSyncAt: "2025-04-16 08:00", diffs: [] },
-  { id: "E005", name: "陈静", status: "active", entity: ENTITY, department: "技术研发中心", position: "后端开发", hireDate: "2023-06-01", contractEnd: "2026-05-31", contractStatus: "normal", idEnd: "2032-02-18", idStatus: "normal", completeness: 75, lastChange: "入职", phone: "159****3344", syncStatus: "pending", lastSyncAt: "—", diffs: [] },
-  { id: "E006", name: "黄磊", status: "active", entity: ENTITY, department: "产品部", position: "产品经理", hireDate: "2022-11-15", contractEnd: "2025-11-14", contractStatus: "expired", idEnd: "2028-07-30", idStatus: "normal", completeness: 100, lastChange: "调岗", phone: "188****9092", syncStatus: "synced", lastSyncAt: "2025-04-15 16:45", diffs: [] },
-  { id: "E007", name: "赵强", status: "active", entity: ENTITY, department: "光学装配车间", position: "装配技师", hireDate: "2019-04-08", contractEnd: "2026-04-07", contractStatus: "normal", idEnd: "2025-11-20", idStatus: "soon", completeness: 80, lastChange: "续签", phone: "135****4471", syncStatus: "failed", lastSyncAt: "2025-04-15 10:12", diffs: [] },
-  { id: "E008", name: "周敏", status: "active", entity: ENTITY, department: "财务部", position: "会计主管", hireDate: "2018-09-12", contractEnd: "2027-09-11", contractStatus: "normal", idEnd: "2033-05-04", idStatus: "normal", completeness: 100, lastChange: "—", phone: "131****0908", syncStatus: "synced", lastSyncAt: "2025-04-16 09:00", diffs: [] },
+  { id: "E004", name: "刘洋", status: "active", entity: "国际", department: "研发部", position: "前端开发", hireDate: "2023-01-10", contractEnd: "2026-01-09", contractStatus: "normal", idEnd: "2030-09-01", idStatus: "normal", completeness: 100, lastChange: "入职", phone: "186****8821", syncStatus: "synced", lastSyncAt: "2025-04-16 08:00", diffs: [] },
+  { id: "E005", name: "陈静", status: "active", entity: "新能源", department: "研发部", position: "后端开发", hireDate: "2023-06-01", contractEnd: "2026-05-31", contractStatus: "normal", idEnd: "2032-02-18", idStatus: "normal", completeness: 75, lastChange: "入职", phone: "159****3344", syncStatus: "pending", lastSyncAt: "—", diffs: [] },
+  { id: "E006", name: "黄磊", status: "active", entity: "新能源（鄂）", department: "项目管理部", position: "产品经理", hireDate: "2022-11-15", contractEnd: "2025-11-14", contractStatus: "expired", idEnd: "2028-07-30", idStatus: "normal", completeness: 100, lastChange: "调岗", phone: "188****9092", syncStatus: "synced", lastSyncAt: "2025-04-15 16:45", diffs: [] },
+  { id: "E007", name: "赵强", status: "active", entity: "激光", department: "生产管理部", position: "装配技师", hireDate: "2019-04-08", contractEnd: "2026-04-07", contractStatus: "normal", idEnd: "2025-11-20", idStatus: "soon", completeness: 80, lastChange: "续签", phone: "135****4471", syncStatus: "failed", lastSyncAt: "2025-04-15 10:12", diffs: [] },
+  { id: "E008", name: "周敏", status: "active", entity: "光电", department: "财务中心", position: "会计主管", hireDate: "2018-09-12", contractEnd: "2027-09-11", contractStatus: "normal", idEnd: "2033-05-04", idStatus: "normal", completeness: 100, lastChange: "—", phone: "131****0908", syncStatus: "synced", lastSyncAt: "2025-04-16 09:00", diffs: [] },
 ];
 
 const stats = [
