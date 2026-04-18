@@ -15,6 +15,9 @@ import JobProfile from "./pages/JobProfile";
 import Candidates from "./pages/Candidates";
 import Performance from "./pages/Performance";
 import PerformanceSummary from "./pages/PerformanceSummary";
+import PerformanceCycle from "./pages/PerformanceCycle";
+import PerformanceForm from "./pages/PerformanceForm";
+import PerformanceInterview from "./pages/PerformanceInterview";
 import Training from "./pages/Training";
 import ChatNew from "./pages/ChatNew";
 import ChatHistory from "./pages/ChatHistory";
@@ -40,6 +43,9 @@ const App = () => (
             <Route path="/recruiting/job/:id/candidates" element={<Candidates />} />
             <Route path="/performance" element={<Performance />} />
             <Route path="/performance/summary" element={<PerformanceSummary />} />
+            <Route path="/performance/cycle/:id" element={<PerformanceCycle />} />
+            <Route path="/performance/form/:id" element={<PerformanceForm />} />
+            <Route path="/performance/interview/:id" element={<PerformanceInterview />} />
             <Route path="/training" element={<Training />} />
             <Route path="/chat/new" element={<ChatNew />} />
             <Route path="/chat/history" element={<ChatHistory />} />
