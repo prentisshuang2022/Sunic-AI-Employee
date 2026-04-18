@@ -975,6 +975,7 @@ export default function Performance() {
           </TabsContent>
         </Tabs>
       </div>
+      <NewCycleDialog open={newCycleOpen} onOpenChange={setNewCycleOpen} />
     </div>
   );
 }
