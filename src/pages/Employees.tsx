@@ -533,7 +533,7 @@ function DiffSheet({ row, onClose }: { row: EmployeeRow | null; onClose: () => v
             {row.name} · 字段差异核对
           </SheetTitle>
           <SheetDescription>
-            钉钉于 <span className="tabular-nums">{row.lastSyncAt}</span> 拉取到变更，请逐项确认是否写入员工档案。
+            钉钉于 <span className="tabular-nums">{row.lastSyncAt}</span> 同步到变更，请逐项确认是否写入员工档案。
           </SheetDescription>
         </SheetHeader>
 
