@@ -428,6 +428,8 @@ function SceneCard({
   flow,
   primaryLabel,
   secondaryLabel,
+  onPrimary,
+  onSecondary,
 }: {
   tag: string;
   tagColor: "primary" | "ai";
@@ -437,6 +439,8 @@ function SceneCard({
   flow: { n: string; t: string; state: "done" | "cur" | "pending" }[];
   primaryLabel: string;
   secondaryLabel: string;
+  onPrimary?: () => void;
+  onSecondary?: () => void;
 }) {
   return (
     <Card
