@@ -15,7 +15,9 @@ import {
   Paperclip,
   GitCompare,
   ArrowDownToLine,
+  FileUp,
 } from "lucide-react";
+import { UpdateMaterialsDialog, type UpdateTarget } from "@/components/employees/UpdateMaterialsDialog";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -166,6 +168,7 @@ export default function Employees() {
   const [statFilter, setStatFilter] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [diffOpen, setDiffOpen] = useState<EmployeeRow | null>(null);
+  const [updateTarget, setUpdateTarget] = useState<UpdateTarget | null>(null);
 
   const departments = [
     "财务中心",
@@ -498,7 +501,23 @@ export default function Employees() {
                       <Button size="sm" variant="outline" onClick={() => toast.success("已通过钉钉发送提醒")}>
                         <CircleDot className="h-3.5 w-3.5 mr-1" />钉钉提醒员工
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => toast.success("已发起续签")}>发起续签</Button>
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          setUpdateTarget({
+                            id: r.id,
+                            name: r.name,
+                            department: r.department,
+                            position: r.position,
+                            contractEnd: r.contractEnd,
+                            contractStatus: r.contractStatus,
+                            idEnd: r.idEnd,
+                            idStatus: r.idStatus,
+                          })
+                        }
+                      >
+                        <FileUp className="h-3.5 w-3.5 mr-1" />资料更新
+                      </Button>
                     </div>
                   </Card>
                 ))}
@@ -510,6 +529,13 @@ export default function Employees() {
 
       {/* 字段差异抽屉 */}
       <DiffSheet row={diffOpen} onClose={() => setDiffOpen(null)} />
+
+      {/* 资料更新弹窗 */}
+      <UpdateMaterialsDialog
+        target={updateTarget}
+        open={!!updateTarget}
+        onClose={() => setUpdateTarget(null)}
+      />
     </>
   );
 }
