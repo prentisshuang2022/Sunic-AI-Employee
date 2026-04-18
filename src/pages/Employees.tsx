@@ -403,12 +403,18 @@ export default function Employees() {
                       <TableCell><ContractCell status={r.contractStatus} /></TableCell>
                       <TableCell><IdCellC status={r.idStatus} /></TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2 min-w-[100px]">
-                          <Progress value={r.completeness} className="h-1.5 flex-1" />
-                          <span className={cn("text-xs tabular-nums", r.completeness < 100 ? "text-warning" : "text-success")}>
-                            {r.completeness}%
-                          </span>
-                        </div>
+                        {(() => {
+                          const total = 4;
+                          const done = Math.round((r.completeness / 100) * total);
+                          return (
+                            <div className="flex items-center gap-2 min-w-[110px]">
+                              <Progress value={(done / total) * 100} className="h-1.5 flex-1" />
+                              <span className={cn("text-xs tabular-nums", done < total ? "text-warning" : "text-success")}>
+                                {done}/{total}
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
