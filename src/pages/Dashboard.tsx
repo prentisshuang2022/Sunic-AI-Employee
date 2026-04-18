@@ -82,7 +82,7 @@ export default function Dashboard() {
           <Card className="lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <CardTitle className="text-base">助手能力</CardTitle>
-              <Badge variant="secondary" className="font-normal">7 个模块</Badge>
+              <Badge variant="secondary" className="font-normal">{modules.length} 个模块</Badge>
             </CardHeader>
             <CardContent className="grid gap-3 sm:grid-cols-2">
               {modules.map((m) => (
