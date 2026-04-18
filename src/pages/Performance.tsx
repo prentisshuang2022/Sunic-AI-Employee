@@ -1,4 +1,712 @@
-import { PlaceholderPage } from "@/components/layout/PlaceholderPage";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  AlertTriangle,
+  ArrowRight,
+  Bell,
+  CheckCircle2,
+  ChevronRight,
+  ClipboardList,
+  Database,
+  FileSpreadsheet,
+  Gauge,
+  LineChart,
+  MessagesSquare,
+  Plus,
+  Search,
+  Sparkles,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  Wand2,
+} from "lucide-react";
+import { toast } from "sonner";
+
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+
+/* ================== 顶部核心指标 ================== */
+const overviewStats = [
+  {
+    label: "在考周期",
+    value: "2025 Q2",
+    hint: "覆盖 12 部门 · 348 人",
+    icon: Gauge,
+    tone: "text-primary",
+  },
+  {
+    label: "待我处理",
+    value: "23",
+    hint: "上级评分 18 · HR 复核 5",
+    icon: ClipboardList,
+    tone: "text-amber-600",
+  },
+  {
+    label: "超期未提交",
+    value: "9",
+    hint: "已自动催办 2 轮",
+    icon: Bell,
+    tone: "text-rose-600",
+  },
+  {
+    label: "AI 异常预警",
+    value: "6",
+    hint: "分数与目标达成不符",
+    icon: AlertTriangle,
+    tone: "text-orange-600",
+  },
+];
+
+/* ================== 5 阶段流程 ================== */
+type StageStatus = "已完成" | "进行中" | "未开始";
+const stages: {
+  key: string;
+  name: string;
+  total: number;
+  done: number;
+  overdue: number;
+  status: StageStatus;
+}[] = [
+  { key: "self", name: "员工自评", total: 348, done: 339, overdue: 9, status: "已完成" },
+  { key: "leader", name: "直属上级考评", total: 348, done: 286, overdue: 4, status: "进行中" },
+  { key: "dept", name: "部门负责人考评", total: 12, done: 3, overdue: 0, status: "进行中" },
+  { key: "hr", name: "HR 汇总复核", total: 1, done: 0, overdue: 0, status: "未开始" },
+  { key: "gm", name: "总经理确认", total: 1, done: 0, overdue: 0, status: "未开始" },
+];
+
+const statusBadge: Record<StageStatus, string> = {
+  已完成: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  进行中: "bg-blue-50 text-blue-700 border-blue-200",
+  未开始: "bg-muted text-muted-foreground border-border",
+};
+
+/* ================== 历史周期 ================== */
+const historyCycles = [
+  { id: "2025Q1", name: "2025 Q1 季度考核", scope: "全员 342 人", status: "已结案", coef: "0.96", finishedAt: "2025-04-12" },
+  { id: "2024H2", name: "2024 下半年考核", scope: "全员 336 人", status: "已结案", coef: "1.02", finishedAt: "2025-01-18" },
+  { id: "2024Q3", name: "2024 Q3 季度考核", scope: "全员 330 人", status: "已结案", coef: "0.98", finishedAt: "2024-10-22" },
+];
+
+/* ================== 战略目标分解 ================== */
+const strategy = {
+  company: {
+    title: "2025 年公司战略目标",
+    items: [
+      { kpi: "营业收入", target: "12.6 亿元", weight: "30%" },
+      { kpi: "激光焊接订单交付率", target: "≥ 98%", weight: "20%" },
+      { kpi: "新产品研发上市", target: "6 款", weight: "20%" },
+      { kpi: "客户投诉响应时长", target: "≤ 4 小时", weight: "15%" },
+      { kpi: "人均效能提升", target: "+12%", weight: "15%" },
+    ],
+  },
+  depts: [
+    {
+      name: "研发中心",
+      head: "周建国",
+      kpis: [
+        { kpi: "新产品立项→量产周期", target: "≤ 9 个月", weight: "30%" },
+        { kpi: "专利申请数", target: "≥ 24 项", weight: "20%" },
+        { kpi: "BOM 成本下降率", target: "≥ 5%", weight: "20%" },
+      ],
+    },
+    {
+      name: "智能装备事业部",
+      head: "高磊",
+      kpis: [
+        { kpi: "订单交付准时率", target: "≥ 98%", weight: "35%" },
+        { kpi: "良品率", target: "≥ 99.2%", weight: "25%" },
+        { kpi: "单台制造工时", target: "下降 8%", weight: "20%" },
+      ],
+    },
+    {
+      name: "销售中心",
+      head: "陈航",
+      kpis: [
+        { kpi: "回款额", target: "10.8 亿元", weight: "40%" },
+        { kpi: "新客户开发", target: "≥ 35 家", weight: "25%" },
+        { kpi: "客户满意度", target: "≥ 90 分", weight: "15%" },
+      ],
+    },
+  ],
+};
+
+/* ================== 指标库 ================== */
+const indicatorFamilies = [
+  { key: "rd", name: "研发岗", count: 28, recent: "新增『代码评审通过率』" },
+  { key: "mfg", name: "生产/工艺岗", count: 32, recent: "更新『SMT 直通率』基准值" },
+  { key: "sales", name: "销售岗", count: 24, recent: "AI 推荐『大客户渗透率』" },
+  { key: "func", name: "职能岗", count: 36, recent: "HR 新增『招聘到岗及时率』" },
+];
+const indicatorRows = [
+  { code: "RD-014", name: "需求按时交付率", family: "研发岗", unit: "%", target: "≥ 95", source: "Jira 系统", aiTag: "行业基准 92%" },
+  { code: "MF-021", name: "OEE 设备综合效率", family: "生产/工艺岗", unit: "%", target: "≥ 78", source: "MES 系统", aiTag: "对标行业 75%" },
+  { code: "MF-007", name: "千件不良数 (PPM)", family: "生产/工艺岗", unit: "PPM", target: "≤ 320", source: "QMS 系统", aiTag: "AI 推荐" },
+  { code: "SL-003", name: "回款及时率", family: "销售岗", unit: "%", target: "≥ 92", source: "ERP / 财务", aiTag: "—" },
+  { code: "FN-019", name: "招聘到岗及时率", family: "职能岗", unit: "%", target: "≥ 90", source: "本系统-招聘助手", aiTag: "新增" },
+];
+
+/* ================== 过程数据 ================== */
+const dataSources = [
+  { name: "MES 制造执行", status: "已联通", lastSync: "5 分钟前", indicators: 14 },
+  { name: "ERP / 财务", status: "已联通", lastSync: "12 分钟前", indicators: 9 },
+  { name: "Jira 研发管理", status: "已联通", lastSync: "1 小时前", indicators: 11 },
+  { name: "CRM 客户系统", status: "鉴权过期", lastSync: "2 天前", indicators: 7 },
+  { name: "QMS 质量管理", status: "已联通", lastSync: "30 分钟前", indicators: 6 },
+];
+const progressRows = [
+  { dept: "智能装备事业部", kpi: "订单交付准时率", target: "98%", current: 96.4, trend: "down", risk: "预警" },
+  { dept: "研发中心", kpi: "新产品立项→量产", target: "≤ 9 月", current: 78, trend: "up", risk: "正常" },
+  { dept: "销售中心", kpi: "回款额 (亿)", target: "10.8", current: 62, trend: "up", risk: "正常" },
+  { dept: "质量中心", kpi: "客户投诉响应", target: "≤ 4h", current: 51, trend: "down", risk: "滞后" },
+];
+
+/* ================== 面谈辅助 ================== */
+const interviewQueue = [
+  { id: "I001", name: "王 磊", dept: "智能装备事业部", role: "高级工艺工程师", score: 87, level: "B+", status: "待面谈", reason: "OEE 显著提升，建议晋升沟通" },
+  { id: "I002", name: "李 雪", dept: "销售中心", role: "大客户经理", score: 72, level: "B-", status: "待面谈", reason: "回款滞后，需改进计划" },
+  { id: "I003", name: "张 涛", dept: "研发中心", role: "光学算法工程师", score: 92, level: "A", status: "已完成", reason: "保留沟通 + 项目奖励" },
+  { id: "I004", name: "孙 玥", dept: "供应链中心", role: "采购主管", score: 65, level: "C", status: "待面谈", reason: "成本指标未达成，需绩改" },
+];
+
 export default function Performance() {
-  return <PlaceholderPage title="绩效助手" description="表单收集 · AI 校验 · 汇总分析" />;
+  const navigate = useNavigate();
+  const [tab, setTab] = useState("cycle");
+  const [family, setFamily] = useState<string>("all");
+  const [search, setSearch] = useState("");
+
+  const filteredIndicators = useMemo(() => {
+    return indicatorRows.filter(
+      (r) =>
+        (family === "all" || r.family === indicatorFamilies.find((f) => f.key === family)?.name) &&
+        (!search || r.name.includes(search) || r.code.includes(search)),
+    );
+  }, [family, search]);
+
+  return (
+    <div className="flex flex-col">
+      <PageHeader
+        title="绩效助手"
+        description="战略目标分解 · 指标库 · 过程数据 · AI 评估校验 · 面谈辅助"
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={() => toast.info("已推送催办给 9 名超期员工")}>
+              <Bell className="mr-1.5 h-4 w-4" />
+              一键催办
+            </Button>
+            <Button size="sm" onClick={() => toast.success("已创建新考核周期草稿")}>
+              <Plus className="mr-1.5 h-4 w-4" />
+              新建考核周期
+            </Button>
+          </>
+        }
+      />
+
+      <div className="space-y-6 p-6">
+        {/* 顶部核心指标 */}
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {overviewStats.map((s) => (
+            <Card key={s.label} className="p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">{s.label}</span>
+                <s.icon className={cn("h-4 w-4", s.tone)} />
+              </div>
+              <div className="mt-2 text-2xl font-semibold">{s.value}</div>
+              <div className="mt-1 text-xs text-muted-foreground">{s.hint}</div>
+            </Card>
+          ))}
+        </div>
+
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList>
+            <TabsTrigger value="cycle">考核周期</TabsTrigger>
+            <TabsTrigger value="strategy">战略目标分解</TabsTrigger>
+            <TabsTrigger value="library">指标库</TabsTrigger>
+            <TabsTrigger value="data">过程数据</TabsTrigger>
+            <TabsTrigger value="interview">面谈辅助</TabsTrigger>
+          </TabsList>
+
+          {/* ============ 考核周期 ============ */}
+          <TabsContent value="cycle" className="space-y-4">
+            <Card className="p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-semibold">2025 Q2 季度考核</h2>
+                    <Badge className="bg-blue-50 text-blue-700 border-blue-200" variant="outline">进行中</Badge>
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    周期：2025-04-01 ~ 2025-06-30 · 评估对象 348 人 · 模板「研发/生产/职能 V3.2」
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => navigate("/performance/cycle/2025Q2")}>
+                  进入周期详情
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* 5 阶段流程 */}
+              <div className="mt-5 grid gap-3 lg:grid-cols-5">
+                {stages.map((st, i) => {
+                  const pct = Math.round((st.done / st.total) * 100);
+                  return (
+                    <div key={st.key} className="rounded-lg border bg-card p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-muted-foreground">阶段 {i + 1}</span>
+                        <Badge variant="outline" className={cn("text-[10px]", statusBadge[st.status])}>
+                          {st.status}
+                        </Badge>
+                      </div>
+                      <div className="mt-1.5 text-sm font-semibold">{st.name}</div>
+                      <div className="mt-2 flex items-baseline gap-1 text-xs text-muted-foreground">
+                        <span className="text-base font-semibold text-foreground">{st.done}</span>
+                        <span>/ {st.total}</span>
+                      </div>
+                      <Progress value={pct} className="mt-2 h-1.5" />
+                      <div className="mt-2 flex items-center justify-between text-[11px]">
+                        {st.overdue > 0 ? (
+                          <span className="text-rose-600">超期 {st.overdue}</span>
+                        ) : (
+                          <span className="text-muted-foreground">无超期</span>
+                        )}
+                        <button
+                          onClick={() => toast.success(`已向${st.name}阶段未提交人员发送催办`)}
+                          className="text-primary hover:underline"
+                        >
+                          催办
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* AI 校验提示 */}
+              <div className="mt-5 flex items-start gap-3 rounded-lg border border-orange-200 bg-orange-50/60 p-3">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-orange-600" />
+                <div className="flex-1 text-xs">
+                  <div className="font-medium text-orange-900">AI 发现 6 项分数异常</div>
+                  <div className="mt-0.5 text-orange-800/80">
+                    上级评分与业务系统达成数据偏差超过 ±15%，建议复核后再进入下一阶段，避免 HR 返工。
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => navigate("/performance/cycle/2025Q2?tab=anomaly")}>
+                  查看异常
+                </Button>
+              </div>
+            </Card>
+
+            {/* 历史周期 */}
+            <Card className="p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-sm font-semibold">历史考核周期</h3>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/performance/summary">
+                    汇总分析
+                    <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>周期</TableHead>
+                    <TableHead>覆盖范围</TableHead>
+                    <TableHead>状态</TableHead>
+                    <TableHead>平均绩效系数</TableHead>
+                    <TableHead>结案时间</TableHead>
+                    <TableHead className="text-right">操作</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {historyCycles.map((c) => (
+                    <TableRow key={c.id}>
+                      <TableCell className="font-medium">{c.name}</TableCell>
+                      <TableCell className="text-muted-foreground">{c.scope}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                          {c.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{c.coef}</TableCell>
+                      <TableCell className="text-muted-foreground">{c.finishedAt}</TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => navigate(`/performance/cycle/${c.id}`)}>
+                          查看
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+          </TabsContent>
+
+          {/* ============ 战略目标分解 ============ */}
+          <TabsContent value="strategy" className="space-y-4">
+            <Card className="p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-primary" />
+                  <h3 className="text-sm font-semibold">{strategy.company.title}</h3>
+                </div>
+                <Button size="sm" onClick={() => toast.success("AI 已基于公司目标重新拆解 12 个部门 KPI")}>
+                  <Wand2 className="mr-1.5 h-4 w-4" />
+                  AI 一键拆解到部门
+                </Button>
+              </div>
+              <div className="mt-4 grid gap-2 md:grid-cols-5">
+                {strategy.company.items.map((it) => (
+                  <div key={it.kpi} className="rounded-lg border bg-muted/30 p-3">
+                    <div className="text-xs text-muted-foreground">{it.kpi}</div>
+                    <div className="mt-1 text-sm font-semibold">{it.target}</div>
+                    <Badge variant="outline" className="mt-2 text-[10px]">权重 {it.weight}</Badge>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <div className="grid gap-3 lg:grid-cols-3">
+              {strategy.depts.map((d) => (
+                <Card key={d.name} className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-sm font-semibold">{d.name}</div>
+                      <div className="text-xs text-muted-foreground">负责人：{d.head}</div>
+                    </div>
+                    <Badge variant="outline" className="bg-primary-soft text-primary border-primary/20">
+                      {d.kpis.length} 项 KPI
+                    </Badge>
+                  </div>
+                  <div className="mt-3 space-y-2">
+                    {d.kpis.map((k) => (
+                      <div key={k.kpi} className="rounded-md border bg-card p-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-medium">{k.kpi}</span>
+                          <span className="text-[10px] text-muted-foreground">权重 {k.weight}</span>
+                        </div>
+                        <div className="mt-1 text-xs text-muted-foreground">目标：{k.target}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <Button variant="ghost" size="sm" className="mt-3 w-full" onClick={() => toast.info(`已展开${d.name}的个人 KPI 拆解`)}>
+                    继续拆解到个人
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* ============ 指标库 ============ */}
+          <TabsContent value="library" className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-4">
+              {indicatorFamilies.map((f) => (
+                <Card
+                  key={f.key}
+                  onClick={() => setFamily(f.key)}
+                  className={cn(
+                    "cursor-pointer p-4 transition-colors",
+                    family === f.key ? "border-primary bg-primary-soft/40" : "hover:bg-muted/40",
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold">{f.name}</span>
+                    <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div className="mt-2 text-xl font-semibold">{f.count}</div>
+                  <div className="mt-1 text-[11px] text-muted-foreground">{f.recent}</div>
+                </Card>
+              ))}
+            </div>
+
+            <Card className="p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="搜索指标编码或名称"
+                      className="h-9 w-64 pl-8"
+                    />
+                  </div>
+                  <Select value={family} onValueChange={setFamily}>
+                    <SelectTrigger className="h-9 w-36">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">全部岗位族</SelectItem>
+                      {indicatorFamilies.map((f) => (
+                        <SelectItem key={f.key} value={f.key}>{f.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => toast.success("AI 已基于行业最新基准更新 4 项指标")}>
+                    <Sparkles className="mr-1.5 h-4 w-4" />
+                    AI 同步行业基准
+                  </Button>
+                  <Button size="sm" onClick={() => toast.success("已新增空白指标")}>
+                    <Plus className="mr-1.5 h-4 w-4" />
+                    新增指标
+                  </Button>
+                </div>
+              </div>
+
+              <Table className="mt-4">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>编码</TableHead>
+                    <TableHead>指标名称</TableHead>
+                    <TableHead>岗位族</TableHead>
+                    <TableHead>单位</TableHead>
+                    <TableHead>目标值</TableHead>
+                    <TableHead>数据来源</TableHead>
+                    <TableHead>AI 标签</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredIndicators.map((r) => (
+                    <TableRow key={r.code}>
+                      <TableCell className="font-mono text-xs">{r.code}</TableCell>
+                      <TableCell className="font-medium">{r.name}</TableCell>
+                      <TableCell className="text-muted-foreground">{r.family}</TableCell>
+                      <TableCell>{r.unit}</TableCell>
+                      <TableCell>{r.target}</TableCell>
+                      <TableCell className="text-muted-foreground">{r.source}</TableCell>
+                      <TableCell>
+                        {r.aiTag === "—" ? (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        ) : (
+                          <Badge variant="outline" className="bg-primary-soft text-primary border-primary/20 text-[10px]">
+                            {r.aiTag}
+                          </Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+          </TabsContent>
+
+          {/* ============ 过程数据 ============ */}
+          <TabsContent value="data" className="space-y-4">
+            <Card className="p-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Database className="h-4 w-4 text-primary" />
+                  <h3 className="text-sm font-semibold">业务系统数据接入</h3>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => toast.success("已重新同步全部数据源")}>
+                  立即同步
+                </Button>
+              </div>
+              <div className="mt-4 grid gap-3 md:grid-cols-3 lg:grid-cols-5">
+                {dataSources.map((s) => (
+                  <div key={s.name} className="rounded-lg border bg-card p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">{s.name}</span>
+                      {s.status === "已联通" ? (
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                      ) : (
+                        <AlertTriangle className="h-4 w-4 text-rose-600" />
+                      )}
+                    </div>
+                    <div className="mt-2 text-[11px] text-muted-foreground">最近同步：{s.lastSync}</div>
+                    <div className="mt-1 text-[11px] text-muted-foreground">驱动指标：{s.indicators}</div>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "mt-2 text-[10px]",
+                        s.status === "已联通"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-rose-50 text-rose-700 border-rose-200",
+                      )}
+                    >
+                      {s.status}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card className="p-5">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold">实时进度看板</h3>
+                <span className="text-xs text-muted-foreground">数据来自业务系统，每 15 分钟刷新</span>
+              </div>
+              <Table className="mt-3">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>部门</TableHead>
+                    <TableHead>核心 KPI</TableHead>
+                    <TableHead>目标</TableHead>
+                    <TableHead>当前进度</TableHead>
+                    <TableHead>趋势</TableHead>
+                    <TableHead>风险</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {progressRows.map((r) => (
+                    <TableRow key={r.dept + r.kpi}>
+                      <TableCell className="font-medium">{r.dept}</TableCell>
+                      <TableCell>{r.kpi}</TableCell>
+                      <TableCell className="text-muted-foreground">{r.target}</TableCell>
+                      <TableCell className="w-56">
+                        <div className="flex items-center gap-2">
+                          <Progress value={typeof r.current === "number" && r.current <= 100 ? r.current : 60} className="h-1.5" />
+                          <span className="w-12 text-right text-xs">{r.current}{typeof r.current === "number" && r.current <= 100 ? "%" : ""}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {r.trend === "up" ? (
+                          <span className="inline-flex items-center text-xs text-emerald-600">
+                            <TrendingUp className="mr-1 h-3.5 w-3.5" />上升
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center text-xs text-rose-600">
+                            <TrendingDown className="mr-1 h-3.5 w-3.5" />下降
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-[10px]",
+                            r.risk === "正常" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                            r.risk === "预警" && "bg-amber-50 text-amber-700 border-amber-200",
+                            r.risk === "滞后" && "bg-rose-50 text-rose-700 border-rose-200",
+                          )}
+                        >
+                          {r.risk}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+          </TabsContent>
+
+          {/* ============ 面谈辅助 ============ */}
+          <TabsContent value="interview" className="space-y-4">
+            <Card className="p-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MessagesSquare className="h-4 w-4 text-primary" />
+                  <h3 className="text-sm font-semibold">绩效面谈队列</h3>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => toast.success("AI 已为 3 位待面谈员工生成建议报告")}>
+                  <Sparkles className="mr-1.5 h-4 w-4" />
+                  批量生成面谈建议
+                </Button>
+              </div>
+
+              <Table className="mt-4">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>员工</TableHead>
+                    <TableHead>部门 / 岗位</TableHead>
+                    <TableHead>得分</TableHead>
+                    <TableHead>等级</TableHead>
+                    <TableHead>AI 沟通要点</TableHead>
+                    <TableHead>状态</TableHead>
+                    <TableHead className="text-right">操作</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {interviewQueue.map((p) => (
+                    <TableRow key={p.id}>
+                      <TableCell className="font-medium">{p.name}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        <div>{p.dept}</div>
+                        <div className="text-[11px]">{p.role}</div>
+                      </TableCell>
+                      <TableCell>{p.score}</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-[10px]",
+                            p.level.startsWith("A") && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                            p.level.startsWith("B") && "bg-blue-50 text-blue-700 border-blue-200",
+                            p.level === "C" && "bg-amber-50 text-amber-700 border-amber-200",
+                          )}
+                        >
+                          {p.level}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="max-w-[260px] text-xs text-muted-foreground">{p.reason}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={cn(
+                          "text-[10px]",
+                          p.status === "已完成"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : "bg-muted text-muted-foreground",
+                        )}>
+                          {p.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" onClick={() => navigate(`/performance/interview/${p.id}`)}>
+                          打开报告
+                          <ChevronRight className="ml-1 h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+
+            <Card className="p-5">
+              <div className="flex items-center gap-2">
+                <LineChart className="h-4 w-4 text-primary" />
+                <h3 className="text-sm font-semibold">绩效结果应用建议</h3>
+              </div>
+              <div className="mt-3 grid gap-3 md:grid-cols-3">
+                {[
+                  { title: "薪酬调整", count: 12, hint: "AI 推荐入薪绩效系数 0.8 ~ 1.2" },
+                  { title: "晋升提名", count: 5, hint: "连续 2 周期 A 级，建议晋升评审" },
+                  { title: "绩改 / PIP", count: 3, hint: "C 级员工需进入 60 天改进计划" },
+                ].map((c) => (
+                  <div key={c.title} className="rounded-lg border bg-card p-4">
+                    <div className="text-sm font-semibold">{c.title}</div>
+                    <div className="mt-1 text-2xl font-semibold">{c.count} 人</div>
+                    <div className="mt-1 text-xs text-muted-foreground">{c.hint}</div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
 }
