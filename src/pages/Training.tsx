@@ -221,100 +221,51 @@ export default function Training() {
           />
         </div>
 
-        {/* 待办 + 对话 */}
-        <div className="grid lg:grid-cols-[1.4fr_1fr] gap-4">
-          <Card className="overflow-hidden">
-            <div className="px-5 py-4 border-b flex items-center justify-between">
-              <h3 className="font-semibold">待办任务</h3>
-              <Tabs value={taskFilter} onValueChange={setTaskFilter}>
-                <TabsList className="h-7">
-                  <TabsTrigger value="all" className="text-xs h-5 px-2.5">全部 12</TabsTrigger>
-                  <TabsTrigger value="urgent" className="text-xs h-5 px-2.5">紧急 3</TabsTrigger>
-                  <TabsTrigger value="overdue" className="text-xs h-5 px-2.5">已逾期 2</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-            <div>
-              {TASKS.map((t, i) => (
-                <div key={i} className="grid grid-cols-[auto_1fr_auto] gap-3 items-center px-5 py-3.5 border-b last:border-b-0 hover:bg-muted/40 transition-colors">
-                  <div className={cn("h-9 w-9 rounded-md flex items-center justify-center font-semibold text-sm", accentMap[t.typeColor as keyof typeof accentMap])}>
-                    {t.type}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium truncate">{t.title}</div>
-                    <div className="text-[11px] text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5 mt-0.5">
-                      {t.meta.map((m, j) => (
-                        <span key={j}>{m}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "font-mono text-[10px] font-normal",
-                        t.state === "urgent" && chipMap.danger,
-                        t.state === "waiting" && chipMap.warning,
-                        t.state === "progress" && chipMap.info,
-                        t.state === "done" && chipMap.success,
-                      )}
-                    >
-                      {t.stateLabel}
-                    </Badge>
-                    <span className="text-[10px] text-muted-foreground font-mono">{t.time}</span>
+        {/* 待办任务 */}
+        <Card className="overflow-hidden">
+          <div className="px-5 py-4 border-b flex items-center justify-between">
+            <h3 className="font-semibold">待办任务</h3>
+            <Tabs value={taskFilter} onValueChange={setTaskFilter}>
+              <TabsList className="h-7">
+                <TabsTrigger value="all" className="text-xs h-5 px-2.5">全部 12</TabsTrigger>
+                <TabsTrigger value="urgent" className="text-xs h-5 px-2.5">紧急 3</TabsTrigger>
+                <TabsTrigger value="overdue" className="text-xs h-5 px-2.5">已逾期 2</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+          <div>
+            {TASKS.map((t, i) => (
+              <div key={i} className="grid grid-cols-[auto_1fr_auto] gap-3 items-center px-5 py-3.5 border-b last:border-b-0 hover:bg-muted/40 transition-colors">
+                <div className={cn("h-9 w-9 rounded-md flex items-center justify-center font-semibold text-sm", accentMap[t.typeColor as keyof typeof accentMap])}>
+                  {t.type}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-medium truncate">{t.title}</div>
+                  <div className="text-[11px] text-muted-foreground flex flex-wrap gap-x-3 gap-y-0.5 mt-0.5">
+                    {t.meta.map((m, j) => (
+                      <span key={j}>{m}</span>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* 钉钉对话面板 */}
-          <Card className="overflow-hidden flex flex-col">
-            <div className="px-4 py-3 bg-foreground text-background flex items-center gap-2.5">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-gradient-to-br from-primary to-[hsl(var(--ai))] text-white text-xs font-semibold">S</AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium leading-tight">培训助手 · Sunic Train</div>
-                <div className="text-[10px] text-background/60 font-mono mt-0.5 tracking-wider">ONLINE · DINGTALK</div>
+                <div className="flex flex-col items-end gap-1">
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "font-mono text-[10px] font-normal",
+                      t.state === "urgent" && chipMap.danger,
+                      t.state === "waiting" && chipMap.warning,
+                      t.state === "progress" && chipMap.info,
+                      t.state === "done" && chipMap.success,
+                    )}
+                  >
+                    {t.stateLabel}
+                  </Badge>
+                  <span className="text-[10px] text-muted-foreground font-mono">{t.time}</span>
+                </div>
               </div>
-              <Badge variant="outline" className="bg-background/10 text-background/80 border-background/20 font-mono text-[10px] tracking-wider">钉钉</Badge>
-            </div>
-            <div className="flex-1 p-4 space-y-3 bg-muted/30 min-h-[360px] max-h-[440px] overflow-y-auto">
-              {CHAT.map((m, i) => (
-                <ChatMsg key={i} {...m} />
-              ))}
-            </div>
-            <div className="p-3 border-t flex items-center gap-2">
-              <div className="flex-1 relative">
-                <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
-                <Input
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="继续指令 · 支持自然语言（输入 / 唤起命令）"
-                  className="pl-9 h-9 text-sm"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && chatInput.trim()) {
-                      toast.success("已发送给培训助手");
-                      setChatInput("");
-                    }
-                  }}
-                />
-              </div>
-              <Button
-                size="icon"
-                className="h-9 w-9 shrink-0"
-                onClick={() => {
-                  if (!chatInput.trim()) return;
-                  toast.success("已发送给培训助手");
-                  setChatInput("");
-                }}
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </Card>
-        </div>
+            ))}
+          </div>
+        </Card>
 
         {/* 考试速览 + 在岗时间线 */}
         <div className="grid lg:grid-cols-2 gap-4">
