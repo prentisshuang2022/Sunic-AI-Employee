@@ -300,14 +300,11 @@ export default function Employees() {
                     onChange={(e) => setKeyword(e.target.value)}
                   />
                 </div>
-                <Select value={syncFilter} onValueChange={setSyncFilter}>
-                  <SelectTrigger className="w-[150px]"><SelectValue placeholder="同步状态" /></SelectTrigger>
+                <Select value={entityFilter} onValueChange={setEntityFilter}>
+                  <SelectTrigger className="w-[150px]"><SelectValue placeholder="合同归属" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">全部同步状态</SelectItem>
-                    <SelectItem value="synced">已同步</SelectItem>
-                    <SelectItem value="diff">有差异</SelectItem>
-                    <SelectItem value="pending">待同步</SelectItem>
-                    <SelectItem value="failed">同步失败</SelectItem>
+                    <SelectItem value="all">全部合同归属</SelectItem>
+                    {ENTITIES.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={department} onValueChange={setDepartment}>
@@ -326,7 +323,7 @@ export default function Employees() {
                     <SelectItem value="expired">已到期</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button variant="outline" size="sm" onClick={() => { setKeyword(""); setDepartment("all"); setSyncFilter("all"); setContractFilter("all"); setStatFilter(null); }}>
+                <Button variant="outline" size="sm" onClick={() => { setKeyword(""); setDepartment("all"); setEntityFilter("all"); setContractFilter("all"); setStatFilter(null); }}>
                   <Filter className="h-4 w-4 mr-1.5" />重置
                 </Button>
               </div>
