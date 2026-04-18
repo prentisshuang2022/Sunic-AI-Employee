@@ -10,8 +10,6 @@ import Employees from "./pages/Employees";
 import EmployeeDetail from "./pages/EmployeeDetail";
 import Attendance from "./pages/Attendance";
 import AttendanceException from "./pages/AttendanceException";
-import LeaveBalance from "./pages/LeaveBalance";
-import MonthlyReview from "./pages/MonthlyReview";
 import Recruiting from "./pages/Recruiting";
 import JobProfile from "./pages/JobProfile";
 import Candidates from "./pages/Candidates";
@@ -37,8 +35,6 @@ const App = () => (
             <Route path="/employees/:id" element={<EmployeeDetail />} />
             <Route path="/attendance" element={<Attendance />} />
             <Route path="/attendance/exception/:id" element={<AttendanceException />} />
-            <Route path="/leave-balance" element={<LeaveBalance />} />
-            <Route path="/monthly-review" element={<MonthlyReview />} />
             <Route path="/recruiting" element={<Recruiting />} />
             <Route path="/recruiting/job/:id" element={<JobProfile />} />
             <Route path="/recruiting/job/:id/candidates" element={<Candidates />} />
