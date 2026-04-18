@@ -199,6 +199,8 @@ export default function Training() {
             ]}
             primaryLabel="进入脱岗培训"
             secondaryLabel="查看题库"
+            onPrimary={() => navigate("/training/offsite")}
+            onSecondary={() => navigate("/training/question-bank")}
           />
           <SceneCard
             tag="SCENE 02 · 在岗培训"
@@ -218,6 +220,8 @@ export default function Training() {
             ]}
             primaryLabel="进入在岗培训"
             secondaryLabel="查看导师"
+            onPrimary={() => navigate("/training/onsite")}
+            onSecondary={() => navigate("/training/mentors")}
           />
         </div>
 
