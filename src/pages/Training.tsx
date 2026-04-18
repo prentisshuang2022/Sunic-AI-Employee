@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   GraduationCap,
   ClipboardCheck,
@@ -9,9 +10,7 @@ import {
   FileUp,
   Sparkles,
   ArrowRight,
-  Send,
   Search,
-  MessageSquare,
   Factory,
   Users,
   Calendar,
