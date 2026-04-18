@@ -493,10 +493,8 @@ function OvertimePanel() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">全部部门</SelectItem>
-              <SelectItem value="研发部">研发部</SelectItem>
-              <SelectItem value="生产部">生产部</SelectItem>
-              <SelectItem value="市场部">市场部</SelectItem>
-              <SelectItem value="销售部">销售部</SelectItem>
+              <SelectItem value="智能部门">智能部门</SelectItem>
+              <SelectItem value="生产一线">生产一线</SelectItem>
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
