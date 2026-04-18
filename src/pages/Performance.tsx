@@ -162,19 +162,58 @@ const initialDepts: DeptStrategy[] = [
   },
 ];
 
-/* ================== 指标库 ================== */
+/* ================== 指标库（按 11 部门）================== */
 const indicatorFamilies = [
-  { key: "rd", name: "研发岗", count: 28, recent: "新增『代码评审通过率』" },
-  { key: "mfg", name: "生产/工艺岗", count: 32, recent: "更新『SMT 直通率』基准值" },
-  { key: "sales", name: "销售岗", count: 24, recent: "AI 推荐『大客户渗透率』" },
-  { key: "func", name: "职能岗", count: 36, recent: "HR 新增『招聘到岗及时率』" },
+  { key: "rd",   name: "研发部",     count: 22, recent: "AI 推荐『激光器光路一次调试通过率』" },
+  { key: "mfg",  name: "生产管理部", count: 26, recent: "更新『OEE 设备综合效率』基准 78%" },
+  { key: "qa",   name: "品质管理部", count: 18, recent: "新增『激光焊接首件合格率』" },
+  { key: "pm",   name: "项目管理部", count: 14, recent: "AI 推荐『重点项目里程碑达成率』" },
+  { key: "sale", name: "营销中心",   count: 16, recent: "更新『大客户渗透率』口径" },
+  { key: "biz",  name: "商务部",     count: 12, recent: "新增『投标响应时长』" },
+  { key: "mkt",  name: "市场营销部", count: 10, recent: "AI 推荐『线索转化率』" },
+  { key: "scm",  name: "供应链",     count: 15, recent: "新增『关键物料齐套率』" },
+  { key: "fin",  name: "财务中心",   count: 11, recent: "更新『费用预算执行偏差』" },
+  { key: "adm",  name: "综合管理部", count: 13, recent: "HR 新增『招聘到岗及时率』" },
+  { key: "prop", name: "物业",       count: 6,  recent: "新增『园区安全巡检覆盖率』" },
 ];
 const indicatorRows = [
-  { code: "RD-014", name: "需求按时交付率", family: "研发岗", unit: "%", target: "≥ 95", source: "Jira 系统", aiTag: "行业基准 92%" },
-  { code: "MF-021", name: "OEE 设备综合效率", family: "生产/工艺岗", unit: "%", target: "≥ 78", source: "MES 系统", aiTag: "对标行业 75%" },
-  { code: "MF-007", name: "千件不良数 (PPM)", family: "生产/工艺岗", unit: "PPM", target: "≤ 320", source: "QMS 系统", aiTag: "AI 推荐" },
-  { code: "SL-003", name: "回款及时率", family: "销售岗", unit: "%", target: "≥ 92", source: "ERP / 财务", aiTag: "—" },
-  { code: "FN-019", name: "招聘到岗及时率", family: "职能岗", unit: "%", target: "≥ 90", source: "本系统-招聘助手", aiTag: "新增" },
+  // 研发部
+  { code: "RD-014", name: "需求按时交付率", family: "研发部", unit: "%", target: "≥ 95", source: "Jira 系统", aiTag: "行业基准 92%" },
+  { code: "RD-021", name: "激光器光路一次调试通过率", family: "研发部", unit: "%", target: "≥ 92", source: "PLM 系统", aiTag: "AI 推荐" },
+  { code: "RD-008", name: "新产品立项→量产周期", family: "研发部", unit: "月", target: "≤ 9", source: "Jira 系统", aiTag: "对标行业 12 月" },
+  // 生产管理部
+  { code: "MF-021", name: "OEE 设备综合效率", family: "生产管理部", unit: "%", target: "≥ 78", source: "MES 系统", aiTag: "对标行业 75%" },
+  { code: "MF-014", name: "工时利用率", family: "生产管理部", unit: "%", target: "≥ 85", source: "MES 系统", aiTag: "—" },
+  { code: "MF-031", name: "订单交付准时率", family: "生产管理部", unit: "%", target: "≥ 98", source: "MES 系统", aiTag: "—" },
+  // 品质管理部
+  { code: "QA-007", name: "千件不良数 (PPM)", family: "品质管理部", unit: "PPM", target: "≤ 320", source: "QMS 系统", aiTag: "AI 推荐" },
+  { code: "QA-012", name: "激光焊接首件合格率", family: "品质管理部", unit: "%", target: "≥ 96", source: "QMS 系统", aiTag: "新增" },
+  { code: "QA-019", name: "客户投诉响应时长", family: "品质管理部", unit: "h", target: "≤ 4", source: "CRM / QMS", aiTag: "—" },
+  // 项目管理部
+  { code: "PM-003", name: "重点项目里程碑达成率", family: "项目管理部", unit: "%", target: "100", source: "Jira / 项目台账", aiTag: "AI 推荐" },
+  { code: "PM-009", name: "项目预算执行偏差", family: "项目管理部", unit: "%", target: "≤ 5", source: "ERP / 财务", aiTag: "—" },
+  // 营销中心
+  { code: "SL-003", name: "回款及时率", family: "营销中心", unit: "%", target: "≥ 92", source: "ERP / 财务", aiTag: "—" },
+  { code: "SL-011", name: "大客户渗透率（新能源/3C）", family: "营销中心", unit: "%", target: "≥ 35", source: "CRM 系统", aiTag: "AI 推荐" },
+  { code: "SL-018", name: "新客户开发数", family: "营销中心", unit: "家", target: "≥ 35", source: "CRM 系统", aiTag: "—" },
+  // 商务部
+  { code: "BZ-005", name: "投标响应时长", family: "商务部", unit: "天", target: "≤ 3", source: "CRM 系统", aiTag: "新增" },
+  { code: "BZ-012", name: "合同评审通过率", family: "商务部", unit: "%", target: "≥ 95", source: "OA / 合同台账", aiTag: "—" },
+  // 市场营销部
+  { code: "MK-004", name: "线索转化率", family: "市场营销部", unit: "%", target: "≥ 18", source: "CRM 系统", aiTag: "AI 推荐" },
+  { code: "MK-010", name: "品牌曝光增长", family: "市场营销部", unit: "%", target: "≥ 30", source: "市场报告", aiTag: "—" },
+  // 供应链
+  { code: "SC-006", name: "关键物料齐套率", family: "供应链", unit: "%", target: "≥ 95", source: "ERP 系统", aiTag: "新增" },
+  { code: "SC-013", name: "采购成本下降率", family: "供应链", unit: "%", target: "≥ 5", source: "ERP 系统", aiTag: "—" },
+  // 财务中心
+  { code: "FN-002", name: "费用预算执行偏差", family: "财务中心", unit: "%", target: "≤ 5", source: "ERP / 财务", aiTag: "—" },
+  { code: "FN-008", name: "月结关账及时率", family: "财务中心", unit: "%", target: "100", source: "ERP / 财务", aiTag: "—" },
+  // 综合管理部
+  { code: "AD-019", name: "招聘到岗及时率", family: "综合管理部", unit: "%", target: "≥ 90", source: "本系统-招聘助手", aiTag: "新增" },
+  { code: "AD-024", name: "员工培训完成率", family: "综合管理部", unit: "%", target: "≥ 95", source: "本系统-培训助手", aiTag: "—" },
+  // 物业
+  { code: "PR-002", name: "园区安全巡检覆盖率", family: "物业", unit: "%", target: "100", source: "EHS 系统", aiTag: "新增" },
+  { code: "PR-007", name: "设施报修响应时长", family: "物业", unit: "h", target: "≤ 2", source: "OA 系统", aiTag: "—" },
 ];
 
 /* ================== 过程数据 ================== */
