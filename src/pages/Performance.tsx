@@ -825,6 +825,8 @@ export default function Performance() {
                       <span className="text-sm font-medium">{s.name}</span>
                       {s.status === "已联通" ? (
                         <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                      ) : s.status === "暂未联通" ? (
+                        <Database className="h-4 w-4 text-muted-foreground" />
                       ) : (
                         <AlertTriangle className="h-4 w-4 text-rose-600" />
                       )}
@@ -837,6 +839,8 @@ export default function Performance() {
                         "mt-2 text-[10px]",
                         s.status === "已联通"
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : s.status === "暂未联通"
+                          ? "bg-muted text-muted-foreground border-border"
                           : "bg-rose-50 text-rose-700 border-rose-200",
                       )}
                     >
