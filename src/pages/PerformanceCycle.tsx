@@ -83,7 +83,7 @@ export default function PerformanceCycle() {
       if (tab === "anomaly" && r.status !== "AI 异常") return false;
       if (tab === "overdue" && r.status !== "超期") return false;
       if (dept !== "all" && r.dept !== dept) return false;
-      if (search && !r.name.includes(search) && !r.id.includes(search)) return false;
+      if (search && !r.name.includes(search)) return false;
       return true;
     });
   }, [tab, dept, search]);
@@ -171,7 +171,7 @@ export default function PerformanceCycle() {
                   <Input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="搜索姓名 / 工号"
+                    placeholder="搜索姓名"
                     className="h-9 w-56 pl-8"
                   />
                 </div>
@@ -208,7 +208,6 @@ export default function PerformanceCycle() {
                     <TableRow key={r.id}>
                       <TableCell>
                         <div className="font-medium">{r.name}</div>
-                        <div className="text-[11px] text-muted-foreground">{r.id}</div>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         <div>{r.dept}</div>

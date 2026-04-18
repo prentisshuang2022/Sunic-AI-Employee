@@ -61,7 +61,7 @@ export default function PerformanceForm() {
   return (
     <div className="flex flex-col">
       <PageHeader
-        title={`绩效评估表 · ${id}`}
+        title="绩效评估表"
         description="王磊 · 智能装备事业部 · 高级工艺工程师 · 2025 Q2"
         backTo="/performance/cycle/2025Q2"
         backLabel="返回周期名单"
