@@ -34,6 +34,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { NewExamDialog } from "@/components/training/NewExamDialog";
+import { ImportMaterialsSheet } from "@/components/training/ImportMaterialsSheet";
 
 const KPIS = [
   { label: "本月考试场次", value: "24", unit: "场", trend: "↑ 18% 环比", trendKind: "up" as const, icon: ClipboardCheck, foot: "脱岗 18 场 · 在岗抽测 6 场", accent: "primary" },
@@ -122,6 +123,7 @@ const chipMap = {
 export default function Training() {
   const [taskFilter, setTaskFilter] = useState("all");
   const [examOpen, setExamOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const navigate = useNavigate();
 
   return (
@@ -134,7 +136,7 @@ export default function Training() {
             <Button size="sm" onClick={() => setExamOpen(true)}>
               <Sparkles className="h-4 w-4 mr-1.5" />AI 一键出卷
             </Button>
-            <Button variant="outline" size="sm" onClick={() => navigate("/training/materials")}>
+            <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
               <FileUp className="h-4 w-4 mr-1.5" />导入培训材料
             </Button>
             <Button variant="outline" size="sm" onClick={() => setExamOpen(true)}>
