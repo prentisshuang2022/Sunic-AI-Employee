@@ -121,8 +121,8 @@ const chipMap = {
 
 export default function Training() {
   const [taskFilter, setTaskFilter] = useState("all");
-  const [chatInput, setChatInput] = useState("");
   const [examOpen, setExamOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -134,7 +134,7 @@ export default function Training() {
             <Button size="sm" onClick={() => setExamOpen(true)}>
               <Sparkles className="h-4 w-4 mr-1.5" />AI 一键出卷
             </Button>
-            <Button variant="outline" size="sm" onClick={() => toast.success("已打开材料导入")}>
+            <Button variant="outline" size="sm" onClick={() => navigate("/training/materials")}>
               <FileUp className="h-4 w-4 mr-1.5" />导入培训材料
             </Button>
             <Button variant="outline" size="sm" onClick={() => setExamOpen(true)}>
