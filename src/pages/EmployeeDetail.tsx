@@ -191,11 +191,15 @@ export default function EmployeeDetail() {
               <Field label="联系号码" value={EMP.phone} meta={FIELD_META["联系号码"]} />
               <Field label="部门" value={EMP.department} meta={FIELD_META["部门"]} />
               <Field label="现任职务" value={EMP.position} meta={FIELD_META["现任职务"]} />
-              <Field label="资料完整度" value={
-                <span className={cn("font-medium", EMP.completeness < 100 ? "text-warning" : "text-success")}>
-                  {EMP.completeness}%
-                </span>
-              } />
+              <Field label="资料状态" value={(() => {
+                const total = 4;
+                const done = Math.round((EMP.completeness / 100) * total);
+                return (
+                  <span className={cn("font-medium tabular-nums", done < total ? "text-warning" : "text-success")}>
+                    {done}/{total} 份
+                  </span>
+                );
+              })()} />
             </div>
           </div>
 
