@@ -204,6 +204,65 @@ export default function Performance() {
   const [family, setFamily] = useState<string>("all");
   const [search, setSearch] = useState("");
 
+  // 战略目标 state
+  const [company, setCompany] = useState<CompanyStrategy>(initialCompany);
+  const [depts, setDepts] = useState<DeptStrategy[]>(initialDepts);
+  const [editingCompany, setEditingCompany] = useState(false);
+  const [editingDept, setEditingDept] = useState<string | null>(null);
+
+  const companyWeightSum = company.items.reduce((s, it) => s + (parseInt(it.weight) || 0), 0);
+
+  const updateCompanyItem = (i: number, key: keyof KpiItem, v: string) =>
+    setCompany((c) => ({ ...c, items: c.items.map((it, idx) => (idx === i ? { ...it, [key]: v } : it)) }));
+  const addCompanyItem = () =>
+    setCompany((c) => ({ ...c, items: [...c.items, { kpi: "", target: "", weight: "0%" }] }));
+  const removeCompanyItem = (i: number) =>
+    setCompany((c) => ({ ...c, items: c.items.filter((_, idx) => idx !== i) }));
+
+  const updateDeptKpi = (deptName: string, i: number, key: keyof KpiItem, v: string) =>
+    setDepts((ds) => ds.map((d) => d.name === deptName
+      ? { ...d, kpis: d.kpis.map((k, idx) => (idx === i ? { ...k, [key]: v } : k)) }
+      : d));
+  const addDeptKpi = (deptName: string) =>
+    setDepts((ds) => ds.map((d) => d.name === deptName
+      ? { ...d, kpis: [...d.kpis, { kpi: "", target: "", weight: "0%" }] }
+      : d));
+  const removeDeptKpi = (deptName: string, i: number) =>
+    setDepts((ds) => ds.map((d) => d.name === deptName
+      ? { ...d, kpis: d.kpis.filter((_, idx) => idx !== i) }
+      : d));
+
+  const aiBreakdown = () => {
+    toast.success("AI 已基于公司目标重新生成 3 个部门的 KPI 草稿，请逐项确认");
+    // 模拟 AI 拆解：清空并加入若干推荐项
+    setDepts((ds) => ds.map((d) => ({
+      ...d,
+      kpis: d.name === "研发中心"
+        ? [
+            { kpi: "新产品上市数量", target: "≥ 6 款", weight: "30%" },
+            { kpi: "研发立项→量产周期", target: "≤ 9 个月", weight: "25%" },
+            { kpi: "BOM 成本下降率", target: "≥ 5%", weight: "20%" },
+            { kpi: "专利申请数", target: "≥ 24 项", weight: "15%" },
+            { kpi: "客诉技术响应", target: "≤ 4 小时", weight: "10%" },
+          ]
+        : d.name === "智能装备事业部"
+        ? [
+            { kpi: "订单交付准时率", target: "≥ 98%", weight: "30%" },
+            { kpi: "产值贡献", target: "8.4 亿元", weight: "25%" },
+            { kpi: "良品率", target: "≥ 99.2%", weight: "20%" },
+            { kpi: "单台制造工时", target: "下降 8%", weight: "15%" },
+            { kpi: "人均产值", target: "+12%", weight: "10%" },
+          ]
+        : [
+            { kpi: "回款额", target: "10.8 亿元", weight: "35%" },
+            { kpi: "新客户开发", target: "≥ 35 家", weight: "20%" },
+            { kpi: "激光焊接订单", target: "≥ 8 亿", weight: "20%" },
+            { kpi: "客户满意度", target: "≥ 90 分", weight: "15%" },
+            { kpi: "客诉响应时长", target: "≤ 4 小时", weight: "10%" },
+          ],
+    })));
+  };
+
   const filteredIndicators = useMemo(() => {
     return indicatorRows.filter(
       (r) =>
