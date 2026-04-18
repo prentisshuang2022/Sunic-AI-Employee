@@ -170,8 +170,8 @@ export default function EmployeeDetail() {
                   仅看差异
                 </Button>
               )}
-              <Button size="sm" onClick={() => toast.success("已从钉钉拉取最新")}>
-                <ArrowDownToLine className="h-4 w-4 mr-1.5" />从钉钉拉取
+              <Button size="sm" onClick={() => toast.success("已从钉钉同步最新")}>
+                <ArrowDownToLine className="h-4 w-4 mr-1.5" />从钉钉同步
               </Button>
             </div>
           </div>
