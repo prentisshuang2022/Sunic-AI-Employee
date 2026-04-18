@@ -31,28 +31,23 @@ interface NewIndicatorDialogProps {
   defaultFamily?: string; // 默认岗位族 key
 }
 
-// 三工光电岗位族（与主页 indicatorFamilies 对齐）
+// 三工光电 11 个真实部门（与主页 indicatorFamilies 对齐）
 const FAMILY_OPTIONS = [
-  { key: "rd", name: "研发岗", prefix: "RD" },
-  { key: "mfg", name: "生产/工艺岗", prefix: "MF" },
-  { key: "sales", name: "销售岗", prefix: "SL" },
-  { key: "func", name: "职能岗", prefix: "FN" },
+  { key: "rd",   name: "研发部",     prefix: "RD" },
+  { key: "mfg",  name: "生产管理部", prefix: "MF" },
+  { key: "qa",   name: "品质管理部", prefix: "QA" },
+  { key: "pm",   name: "项目管理部", prefix: "PM" },
+  { key: "sale", name: "营销中心",   prefix: "SL" },
+  { key: "biz",  name: "商务部",     prefix: "BZ" },
+  { key: "mkt",  name: "市场营销部", prefix: "MK" },
+  { key: "scm",  name: "供应链",     prefix: "SC" },
+  { key: "fin",  name: "财务中心",   prefix: "FN" },
+  { key: "adm",  name: "综合管理部", prefix: "AD" },
+  { key: "prop", name: "物业",       prefix: "PR" },
 ];
 
-// 适用部门（三工光电组织架构 · 11 个部门）
-const DEPT_OPTIONS = [
-  "研发部",
-  "生产管理部",
-  "品质管理部",
-  "项目管理部",
-  "营销中心",
-  "商务部",
-  "市场营销部",
-  "供应链",
-  "财务中心",
-  "综合管理部",
-  "物业",
-];
+// 适用部门（与岗位族同一组）
+const DEPT_OPTIONS = FAMILY_OPTIONS.map((f) => f.name);
 
 // 数据来源（已联通的业务系统 + 手填）
 const SOURCE_OPTIONS = [
@@ -63,6 +58,7 @@ const SOURCE_OPTIONS = [
   { value: "CRM", label: "CRM 客户系统", auto: true },
   { value: "PLM", label: "PLM 产品生命周期", auto: true },
   { value: "EHS", label: "EHS 安全环境", auto: true },
+  { value: "OA", label: "OA 协同办公", auto: true },
   { value: "HR", label: "本系统-人事 AI", auto: true },
   { value: "manual", label: "上级评 / 手工填报", auto: false },
 ];
@@ -75,7 +71,7 @@ const SCORE_METHODS = [
   { value: "qualitative", label: "定性评估（A/B/C/D 四档）" },
 ];
 
-// AI 推荐指标库（按岗位族，结合三工光电激光焊接/精密装备行业）
+// AI 推荐指标库（按 11 个部门，结合三工光电激光焊接/精密装备行业）
 const AI_RECOMMENDATIONS: Record<string, Array<{
   name: string; unit: string; target: string; source: string; method: string; reason: string;
 }>> = {
@@ -87,21 +83,57 @@ const AI_RECOMMENDATIONS: Record<string, Array<{
   ],
   mfg: [
     { name: "OEE 设备综合效率", unit: "%", target: "≥ 78", source: "MES", method: "linear", reason: "对标行业 75%" },
+    { name: "订单交付准时率", unit: "%", target: "≥ 98", source: "MES", method: "linear", reason: "客户履约关键" },
+    { name: "工时利用率", unit: "%", target: "≥ 85", source: "MES", method: "linear", reason: "人效核心" },
+    { name: "单台制造工时", unit: "h", target: "下降 8%", source: "MES", method: "reverse", reason: "降本指标" },
+  ],
+  qa: [
     { name: "激光焊接首件合格率", unit: "%", target: "≥ 96", source: "QMS", method: "linear", reason: "三工标志性工艺指标" },
     { name: "精密装配千件不良 (PPM)", unit: "PPM", target: "≤ 320", source: "QMS", method: "reverse", reason: "AI 推荐，行业先进 280" },
-    { name: "工时利用率", unit: "%", target: "≥ 85", source: "MES", method: "linear", reason: "人效核心" },
-    { name: "现场 6S 巡检评分", unit: "分", target: "≥ 90", source: "EHS", method: "linear", reason: "安全合规" },
+    { name: "客户投诉响应时长", unit: "h", target: "≤ 4", source: "QMS", method: "reverse", reason: "客户满意度关键" },
+    { name: "供应商来料合格率", unit: "%", target: "≥ 98", source: "QMS", method: "linear", reason: "源头质量管控" },
   ],
-  sales: [
+  pm: [
+    { name: "重点项目里程碑达成率", unit: "%", target: "100", source: "Jira", method: "linear", reason: "战略项目关键" },
+    { name: "项目预算执行偏差", unit: "%", target: "≤ 5", source: "ERP", method: "reverse", reason: "成本管控" },
+    { name: "项目交付准时率", unit: "%", target: "≥ 95", source: "Jira", method: "linear", reason: "客户履约" },
+  ],
+  sale: [
     { name: "大客户渗透率（新能源/3C）", unit: "%", target: "≥ 35", source: "CRM", method: "linear", reason: "三工战略客户结构" },
     { name: "订单回款及时率", unit: "%", target: "≥ 92", source: "ERP", method: "linear", reason: "现金流关键" },
     { name: "新客户开发数", unit: "家", target: "≥ 35", source: "CRM", method: "linear", reason: "—" },
-    { name: "投标中标率", unit: "%", target: "≥ 45", source: "CRM", method: "linear", reason: "AI 基于历史数据测算" },
+    { name: "客户满意度 NPS", unit: "分", target: "≥ 90", source: "CRM", method: "linear", reason: "客户保留率指标" },
   ],
-  func: [
+  biz: [
+    { name: "投标响应时长", unit: "天", target: "≤ 3", source: "CRM", method: "reverse", reason: "商机响应速度" },
+    { name: "投标中标率", unit: "%", target: "≥ 45", source: "CRM", method: "linear", reason: "AI 基于历史数据测算" },
+    { name: "合同评审通过率", unit: "%", target: "≥ 95", source: "OA", method: "linear", reason: "合规风控" },
+  ],
+  mkt: [
+    { name: "线索转化率", unit: "%", target: "≥ 18", source: "CRM", method: "linear", reason: "营销 ROI 核心" },
+    { name: "品牌曝光增长", unit: "%", target: "≥ 30", source: "manual", method: "linear", reason: "品牌建设" },
+    { name: "展会有效线索数", unit: "条", target: "≥ 200", source: "CRM", method: "linear", reason: "B2B 主渠道" },
+  ],
+  scm: [
+    { name: "关键物料齐套率", unit: "%", target: "≥ 95", source: "ERP", method: "linear", reason: "保障生产节拍" },
+    { name: "采购成本下降率", unit: "%", target: "≥ 5", source: "ERP", method: "linear", reason: "降本核心" },
+    { name: "库存周转天数", unit: "天", target: "≤ 60", source: "ERP", method: "reverse", reason: "运营效率" },
+  ],
+  fin: [
+    { name: "费用预算执行偏差", unit: "%", target: "≤ 5", source: "ERP", method: "reverse", reason: "财务管控" },
+    { name: "月结关账及时率", unit: "%", target: "100", source: "ERP", method: "linear", reason: "财务规范" },
+    { name: "应收账款周转天数", unit: "天", target: "≤ 75", source: "ERP", method: "reverse", reason: "现金流管控" },
+  ],
+  adm: [
     { name: "招聘到岗及时率", unit: "%", target: "≥ 90", source: "HR", method: "linear", reason: "本系统-招聘助手联动" },
     { name: "关键岗位人才储备覆盖率", unit: "%", target: "≥ 80", source: "HR", method: "linear", reason: "继任管理" },
-    { name: "费用预算执行偏差", unit: "%", target: "≤ 5", source: "ERP", method: "reverse", reason: "财务管控" },
+    { name: "员工培训完成率", unit: "%", target: "≥ 95", source: "HR", method: "linear", reason: "本系统-培训助手联动" },
+    { name: "OA 工单处理及时率", unit: "%", target: "≥ 95", source: "OA", method: "linear", reason: "服务效率" },
+  ],
+  prop: [
+    { name: "园区安全巡检覆盖率", unit: "%", target: "100", source: "EHS", method: "linear", reason: "安全合规底线" },
+    { name: "设施报修响应时长", unit: "h", target: "≤ 2", source: "OA", method: "reverse", reason: "员工服务" },
+    { name: "园区能耗下降率", unit: "%", target: "≥ 3", source: "EHS", method: "linear", reason: "降本与 ESG" },
   ],
 };
 
@@ -115,7 +147,7 @@ export function NewIndicatorDialog({ open, onOpenChange, defaultFamily = "mfg" }
   const [weight, setWeight] = useState("10");
   const [source, setSource] = useState("MES");
   const [method, setMethod] = useState("linear");
-  const [depts, setDepts] = useState<string[]>(["智能装备事业部"]);
+  const [depts, setDepts] = useState<string[]>(["生产管理部"]);
   const [autoFetch, setAutoFetch] = useState(true);
   const [aiValidate, setAiValidate] = useState(true);
   const [pickedAi, setPickedAi] = useState<number | null>(null);
