@@ -16,6 +16,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { AddMentorDialog, type NewMentorPayload } from "@/components/training/AddMentorDialog";
 
 type Craft = "laser" | "solar" | "qa" | "trade";
 type Site = "黄龙山基地" | "鄂州基地" | "光谷研发中心" | "深圳分公司";
@@ -52,7 +53,7 @@ interface Mentor {
   status: "available" | "full" | "rest";
 }
 
-const MENTORS: Mentor[] = [
+const INITIAL_MENTORS: Mentor[] = [
   { id: "M-001", name: "李建华", title: "仓储主管", dept: "供应链 / 仓储组", site: "鄂州基地", level: "金牌", years: 12, active: 3, capacity: 4, graduated: 28, rating: 4.9, passRate: 96, crafts: ["qa"], tags: ["ERP 出入库", "光学件存储", "新员工首选"], status: "available" },
   { id: "M-002", name: "陈志强", title: "激光工艺工程师", dept: "生产管理部 / 激光组", site: "黄龙山基地", level: "金牌", years: 9, active: 4, capacity: 4, graduated: 22, rating: 4.8, passRate: 93, crafts: ["laser"], tags: ["划片机参数", "光路调整", "异常处置"], status: "full" },
   { id: "M-003", name: "王慧敏", title: "品质主管", dept: "品质管理部", site: "黄龙山基地", level: "金牌", years: 11, active: 2, capacity: 3, graduated: 31, rating: 4.9, passRate: 98, crafts: ["qa"], tags: ["ISO9001", "3A 认证", "内审员"], status: "available" },
@@ -109,9 +110,26 @@ export default function TrainingMentors() {
   const [craft, setCraft] = useState<(typeof CRAFT_FILTER)[number]>("全部");
   const [tab, setTab] = useState("all");
   const [selected, setSelected] = useState<Mentor | null>(null);
+  const [mentors, setMentors] = useState<Mentor[]>(INITIAL_MENTORS);
+  const [addOpen, setAddOpen] = useState(false);
+
+  const handleAdd = (p: NewMentorPayload) => {
+    const id = `M-${String(mentors.length + 1).padStart(3, "0")}`;
+    const m: Mentor = {
+      id, name: p.name, title: p.title, dept: p.dept,
+      site: p.site, level: p.level, years: p.years,
+      active: 0, capacity: p.capacity, graduated: 0,
+      rating: 5.0, passRate: 100,
+      crafts: p.crafts, tags: p.tags,
+      status: "available",
+    };
+    setMentors([m, ...mentors]);
+    toast.success(`已新增导师「${p.name}」，进入认证名册`);
+    setSelected(m);
+  };
 
   const filtered = useMemo(() => {
-    return MENTORS.filter((m) => {
+    return mentors.filter((m) => {
       if (q && !m.name.includes(q) && !m.title.includes(q) && !m.tags.some((t) => t.includes(q))) return false;
       if (site !== "全部" && m.site !== site) return false;
       if (craft !== "全部" && !m.crafts.includes(craft)) return false;
@@ -120,7 +138,7 @@ export default function TrainingMentors() {
       if (tab === "full" && m.status !== "full") return false;
       return true;
     });
-  }, [q, site, craft, tab]);
+  }, [mentors, q, site, craft, tab]);
 
   return (
     <>
@@ -135,7 +153,7 @@ export default function TrainingMentors() {
             <Button size="sm" onClick={() => toast.success("AI 已根据岗位与厂区匹配出 3 位候选导师")}>
               <Sparkles className="h-4 w-4 mr-1.5" />智能匹配导师
             </Button>
-            <Button variant="outline" size="sm" onClick={() => toast.info("打开导师认证申请表")}>
+            <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
               <Plus className="h-4 w-4 mr-1.5" />新增导师
             </Button>
           </>
@@ -203,13 +221,13 @@ export default function TrainingMentors() {
           <div className="mt-3 pt-3 border-t flex items-center justify-between">
             <Tabs value={tab} onValueChange={setTab}>
               <TabsList className="h-7">
-                <TabsTrigger value="all" className="text-xs h-5 px-2.5">全部 {MENTORS.length}</TabsTrigger>
+                <TabsTrigger value="all" className="text-xs h-5 px-2.5">全部 {mentors.length}</TabsTrigger>
                 <TabsTrigger value="gold" className="text-xs h-5 px-2.5">金牌导师</TabsTrigger>
                 <TabsTrigger value="available" className="text-xs h-5 px-2.5">可接收</TabsTrigger>
                 <TabsTrigger value="full" className="text-xs h-5 px-2.5">已满员</TabsTrigger>
               </TabsList>
             </Tabs>
-            <span className="text-[11px] text-muted-foreground font-mono">命中 {filtered.length} / {MENTORS.length}</span>
+            <span className="text-[11px] text-muted-foreground font-mono">命中 {filtered.length} / {mentors.length}</span>
           </div>
         </Card>
 
@@ -228,6 +246,8 @@ export default function TrainingMentors() {
           {selected && <MentorDetail mentor={selected} />}
         </SheetContent>
       </Sheet>
+
+      <AddMentorDialog open={addOpen} onClose={() => setAddOpen(false)} onSubmit={handleAdd} />
     </>
   );
 }
