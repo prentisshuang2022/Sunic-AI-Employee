@@ -347,6 +347,7 @@ export default function Attendance() {
 
 function ExceptionsPanel() {
   const navigate = useNavigate();
+  const [dateFilter, setDateFilter] = useState<DateFilterValue>({ preset: "today" });
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("pending");
   const [doneIds, setDoneIds] = useState<Set<string>>(new Set());
