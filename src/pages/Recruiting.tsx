@@ -410,14 +410,11 @@ function CreateJobDialog({ open, onOpenChange, onCreated }: CreateJobDialogProps
           </Field>
 
           <Field label="招聘负责人">
-            <Select value={owner} onValueChange={setOwner}>
-              <SelectTrigger><SelectValue placeholder="选择 HR" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="李婷">李婷</SelectItem>
-                <SelectItem value="王磊">王磊</SelectItem>
-                <SelectItem value="陈芳">陈芳</SelectItem>
-              </SelectContent>
-            </Select>
+            <Input
+              placeholder="输入 HR 姓名"
+              value={owner}
+              onChange={(e) => setOwner(e.target.value)}
+            />
           </Field>
 
           <Field label="岗位 JD" hint="可粘贴现有 JD，AI 将基于此生成岗位画像" className="col-span-2">
