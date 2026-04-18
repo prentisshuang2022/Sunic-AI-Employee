@@ -11,11 +11,10 @@ import {
   CheckCircle2,
   MoreHorizontal,
   X,
-  ArrowUpDown,
-  CloudUpload,
   CircleDot,
   Paperclip,
   GitCompare,
+  ArrowDownToLine,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
