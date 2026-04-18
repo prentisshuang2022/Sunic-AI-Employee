@@ -158,11 +158,11 @@ interface OvertimeRow {
 }
 
 const overtimeRows: OvertimeRow[] = [
-  // 智能部门：餐补 / 调休时数（无金额）
+  // 职能部门：餐补 / 调休时数（无金额）
   {
     id: "O001",
     name: "李明",
-    dept: "智能部门",
+    dept: "职能部门",
     position: "高级工程师",
     group: "总部考勤组",
     date: "2026-04-14",
@@ -179,7 +179,7 @@ const overtimeRows: OvertimeRow[] = [
   {
     id: "O002",
     name: "王芳",
-    dept: "智能部门",
+    dept: "职能部门",
     position: "算法工程师",
     group: "总部考勤组",
     date: "2026-04-12",
@@ -196,7 +196,7 @@ const overtimeRows: OvertimeRow[] = [
   {
     id: "O003",
     name: "张伟",
-    dept: "智能部门",
+    dept: "职能部门",
     position: "产品经理",
     group: "总部考勤组",
     date: "2026-04-13",
@@ -510,13 +510,13 @@ function ExceptionsPanel() {
 
 function OvertimePanel() {
   const [dateFilter, setDateFilter] = useState<DateFilterValue>({ preset: "today" });
-  const [deptFilter, setDeptFilter] = useState<string>("智能部门");
+  const [deptFilter, setDeptFilter] = useState<string>("职能部门");
   const [statusFilter, setStatusFilter] = useState<string>("pending");
   const [uploadOpen, setUploadOpen] = useState(false);
   const [approvedIds, setApprovedIds] = useState<Set<string>>(new Set());
 
-  // 智能部门不展示「工时」列；生产一线 / 全部部门 展示
-  const showWorkHours = deptFilter !== "智能部门";
+  // 职能部门不展示「工时」列；生产一线 / 全部部门 展示
+  const showWorkHours = deptFilter !== "职能部门";
 
   const rows = useMemo(() => {
     return overtimeRows.map((r) =>
@@ -554,7 +554,7 @@ function OvertimePanel() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">全部部门</SelectItem>
-              <SelectItem value="智能部门">智能部门</SelectItem>
+              <SelectItem value="职能部门">职能部门</SelectItem>
               <SelectItem value="生产一线">生产一线</SelectItem>
             </SelectContent>
           </Select>
