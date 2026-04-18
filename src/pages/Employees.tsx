@@ -208,11 +208,11 @@ export default function Employees() {
     <>
       <PageHeader
         title="员工档案管理"
-        description="武汉三工光电 · 钉钉为唯一数据源，本系统单向同步、校验与归档"
+        description="武汉三工光电 · 钉钉为唯一数据源，本系统负责同步、校验与归档"
         actions={
           <>
-            <Button size="sm" onClick={() => toast.success("正在从钉钉拉取员工信息…")}>
-              <ArrowDownToLine className="h-4 w-4 mr-1.5" />从钉钉拉取
+            <Button size="sm" onClick={() => toast.success("正在从钉钉同步员工信息…")}>
+              <ArrowDownToLine className="h-4 w-4 mr-1.5" />从钉钉同步
             </Button>
             <Button variant="outline" size="sm" onClick={() => toast.success(`已导出 ${filtered.length} 条`)}>
               <Download className="h-4 w-4 mr-1.5" />导出
@@ -229,17 +229,17 @@ export default function Employees() {
               <ArrowDownToLine className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1 min-w-[200px]">
-              <div className="text-sm font-medium">钉钉 → 本系统 单向同步</div>
+              <div className="text-sm font-medium">钉钉数据同步</div>
               <div className="text-xs text-muted-foreground mt-0.5">
-                上次全量拉取 <span className="tabular-nums">{lastFullSync}</span> · 当前 <span className="text-warning font-medium">{pendingCount}</span> 名员工待核对
+                上次全量同步 <span className="tabular-nums">{lastFullSync}</span> · 当前 <span className="text-warning font-medium">{pendingCount}</span> 名员工待核对
               </div>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => { setStatFilter("sync"); toast.info("已筛选待核对员工"); }}>
                 查看待核对
               </Button>
-              <Button size="sm" onClick={() => toast.success("已触发全量拉取")}>
-                <RefreshCcw className="h-4 w-4 mr-1.5" />立即拉取
+              <Button size="sm" onClick={() => toast.success("已触发全量同步")}>
+                <RefreshCcw className="h-4 w-4 mr-1.5" />立即同步
               </Button>
             </div>
           </div>
@@ -333,7 +333,7 @@ export default function Employees() {
                   <CheckCircle2 className="h-4 w-4 text-primary" />
                   已选 <span className="font-medium">{selected.length}</span> 名员工
                   <div className="flex-1" />
-                  <Button size="sm" variant="outline" onClick={() => toast.success("已重新从钉钉拉取")}>重新拉取</Button>
+                  <Button size="sm" variant="outline" onClick={() => toast.success("已重新从钉钉同步")}>重新同步</Button>
                   <Button size="sm" variant="outline" onClick={() => toast.success("已接受钉钉变更")}>接受钉钉变更</Button>
                   <Button size="sm" variant="outline" onClick={() => toast.success("提醒已发送")}>提醒补资料</Button>
                   <Button size="sm" variant="ghost" onClick={() => setSelected([])}>取消</Button>
@@ -422,8 +422,8 @@ export default function Employees() {
                                 <GitCompare className="h-4 w-4 mr-2" />查看差异
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem onClick={() => toast.success("已从钉钉拉取最新")}>
-                              <RefreshCcw className="h-4 w-4 mr-2" />从钉钉重新拉取
+                            <DropdownMenuItem onClick={() => toast.success("已从钉钉同步最新")}>
+                              <RefreshCcw className="h-4 w-4 mr-2" />从钉钉重新同步
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => toast.success("已打开附件上传")}>
@@ -446,8 +446,8 @@ export default function Employees() {
             <Card className="p-6">
               <div className="space-y-4">
                 {[
-                  { date: "2025-04-16 14:21", name: "王芳", type: "钉钉变更", desc: "部门：市场部 → 市场部 / 品牌组（钉钉同步拉取）", op: "钉钉" },
-                  { date: "2025-04-15 16:45", name: "黄磊", type: "钉钉变更", desc: "职务：产品经理 → 产品总监（钉钉同步拉取）", op: "钉钉" },
+                  { date: "2025-04-16 14:21", name: "王芳", type: "钉钉变更", desc: "部门：市场部 → 市场部 / 品牌组（钉钉同步）", op: "钉钉" },
+                  { date: "2025-04-15 16:45", name: "黄磊", type: "钉钉变更", desc: "职务：产品经理 → 产品总监（钉钉同步）", op: "钉钉" },
                   { date: "2025-04-14 11:08", name: "张伟", type: "钉钉变更", desc: "现任职务：销售主管 → 销售总监", op: "钉钉" },
                   { date: "2025-04-10 09:00", name: "陈静", type: "入职", desc: "技术研发中心 · 后端开发（钉钉新建）", op: "钉钉" },
                 ].map((c, i) => (
@@ -533,7 +533,7 @@ function DiffSheet({ row, onClose }: { row: EmployeeRow | null; onClose: () => v
             {row.name} · 字段差异核对
           </SheetTitle>
           <SheetDescription>
-            钉钉于 <span className="tabular-nums">{row.lastSyncAt}</span> 拉取到变更，请逐项确认是否写入员工档案。
+            钉钉于 <span className="tabular-nums">{row.lastSyncAt}</span> 同步到变更，请逐项确认是否写入员工档案。
           </SheetDescription>
         </SheetHeader>
 
