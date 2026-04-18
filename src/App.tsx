@@ -13,6 +13,7 @@ import AttendanceException from "./pages/AttendanceException";
 import Recruiting from "./pages/Recruiting";
 import JobProfile from "./pages/JobProfile";
 import Candidates from "./pages/Candidates";
+import ResumeLibrary from "./pages/ResumeLibrary";
 import Performance from "./pages/Performance";
 import PerformanceSummary from "./pages/PerformanceSummary";
 import Training from "./pages/Training";
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/attendance" element={<Attendance />} />
             <Route path="/attendance/exception/:id" element={<AttendanceException />} />
             <Route path="/recruiting" element={<Recruiting />} />
+            <Route path="/recruiting/resumes" element={<ResumeLibrary />} />
             <Route path="/recruiting/job/:id" element={<JobProfile />} />
             <Route path="/recruiting/job/:id/candidates" element={<Candidates />} />
             <Route path="/performance" element={<Performance />} />
