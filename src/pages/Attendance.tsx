@@ -157,10 +157,11 @@ interface OvertimeRow {
 }
 
 const overtimeRows: OvertimeRow[] = [
+  // 智能部门：餐补 / 调休时数（无金额）
   {
     id: "O001",
     name: "李明",
-    dept: "研发部",
+    dept: "智能部门",
     position: "高级工程师",
     group: "总部考勤组",
     date: "2026-04-14",
@@ -170,15 +171,15 @@ const overtimeRows: OvertimeRow[] = [
     isOvertime: "是",
     workHours: 10,
     subsidyType: "餐补",
-    subsidyValue: "36元",
+    subsidyValue: "—",
     remark: "—",
     status: "pending",
   },
   {
     id: "O002",
-    name: "李明",
-    dept: "研发部",
-    position: "高级工程师",
+    name: "王芳",
+    dept: "智能部门",
+    position: "算法工程师",
     group: "总部考勤组",
     date: "2026-04-12",
     clockIn: "08:30",
@@ -193,11 +194,63 @@ const overtimeRows: OvertimeRow[] = [
   },
   {
     id: "O003",
-    name: "李明",
-    dept: "生产部",
-    position: "仓管员",
+    name: "张伟",
+    dept: "智能部门",
+    position: "产品经理",
     group: "总部考勤组",
     date: "2026-04-13",
+    clockIn: "08:30",
+    clockOut: "20:30",
+    abnormal: "加班",
+    isOvertime: "是",
+    workHours: 10,
+    subsidyType: "调休",
+    subsidyValue: "8",
+    remark: "—",
+    status: "pending",
+  },
+  // 生产一线：金额补贴 + 工时
+  {
+    id: "O101",
+    name: "李明",
+    dept: "生产一线",
+    position: "仓管员",
+    group: "生产考勤组",
+    date: "2026-04-14",
+    clockIn: "08:30",
+    clockOut: "20:30",
+    abnormal: "加班",
+    isOvertime: "是",
+    workHours: 10,
+    subsidyType: "金额",
+    subsidyValue: "36元",
+    remark: "—",
+    status: "pending",
+  },
+  {
+    id: "O102",
+    name: "赵六",
+    dept: "生产一线",
+    position: "组装工",
+    group: "生产考勤组",
+    date: "2026-04-14",
+    clockIn: "08:30",
+    clockOut: "20:30",
+    abnormal: "加班",
+    isOvertime: "是",
+    workHours: 10,
+    subsidyType: "金额",
+    subsidyValue: "36元",
+    remark: "—",
+    status: "pending",
+  },
+  {
+    id: "O103",
+    name: "钱七",
+    dept: "生产一线",
+    position: "质检员",
+    group: "生产考勤组",
+    date: "2026-04-14",
     clockIn: "08:30",
     clockOut: "20:30",
     abnormal: "加班",
@@ -453,10 +506,13 @@ function ExceptionsPanel() {
 // ---------- 加班 / 调休 Tab ----------
 
 function OvertimePanel() {
-  const [deptFilter, setDeptFilter] = useState<string>("all");
+  const [deptFilter, setDeptFilter] = useState<string>("智能部门");
   const [statusFilter, setStatusFilter] = useState<string>("pending");
   const [uploadOpen, setUploadOpen] = useState(false);
   const [approvedIds, setApprovedIds] = useState<Set<string>>(new Set());
+
+  // 智能部门不展示「工时」列；生产一线 / 全部部门 展示
+  const showWorkHours = deptFilter !== "智能部门";
 
   const rows = useMemo(() => {
     return overtimeRows.map((r) =>
@@ -521,7 +577,7 @@ function OvertimePanel() {
               <TableHead>上/下班打卡时间</TableHead>
               <TableHead>打卡异常情况</TableHead>
               <TableHead>是否加班</TableHead>
-              <TableHead>工时</TableHead>
+              {showWorkHours && <TableHead>工时</TableHead>}
               <TableHead>加班补贴类型</TableHead>
               <TableHead>补贴内容</TableHead>
               <TableHead>备注</TableHead>
@@ -557,7 +613,11 @@ function OvertimePanel() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-sm">{row.isOvertime}</TableCell>
-                <TableCell className="text-sm">{row.workHours}</TableCell>
+                {showWorkHours && (
+                  <TableCell className="text-sm">
+                    {row.dept === "生产一线" ? row.workHours : "—"}
+                  </TableCell>
+                )}
                 <TableCell className="text-sm text-muted-foreground">{row.subsidyType}</TableCell>
                 <TableCell className="text-sm text-muted-foreground">{row.subsidyValue}</TableCell>
                 <TableCell className="text-sm text-muted-foreground">{row.remark}</TableCell>
@@ -597,7 +657,7 @@ function OvertimePanel() {
             ))}
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={12} className="py-12 text-center text-sm text-muted-foreground">
+                <TableCell colSpan={showWorkHours ? 12 : 11} className="py-12 text-center text-sm text-muted-foreground">
                   当前筛选条件下没有记录
                 </TableCell>
               </TableRow>
