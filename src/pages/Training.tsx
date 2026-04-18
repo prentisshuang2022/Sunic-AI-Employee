@@ -459,6 +459,8 @@ export default function Training() {
           </div>
         </Card>
       </div>
+
+      <NewExamDialog open={examOpen} onClose={() => setExamOpen(false)} />
     </>
   );
 }
