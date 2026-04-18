@@ -114,47 +114,51 @@ const historyCycles = [
 ];
 
 /* ================== 战略目标分解 ================== */
-const strategy = {
-  company: {
-    title: "2025 年公司战略目标",
-    items: [
-      { kpi: "营业收入", target: "12.6 亿元", weight: "30%" },
-      { kpi: "激光焊接订单交付率", target: "≥ 98%", weight: "20%" },
-      { kpi: "新产品研发上市", target: "6 款", weight: "20%" },
-      { kpi: "客户投诉响应时长", target: "≤ 4 小时", weight: "15%" },
-      { kpi: "人均效能提升", target: "+12%", weight: "15%" },
-    ],
-  },
-  depts: [
-    {
-      name: "研发中心",
-      head: "周建国",
-      kpis: [
-        { kpi: "新产品立项→量产周期", target: "≤ 9 个月", weight: "30%" },
-        { kpi: "专利申请数", target: "≥ 24 项", weight: "20%" },
-        { kpi: "BOM 成本下降率", target: "≥ 5%", weight: "20%" },
-      ],
-    },
-    {
-      name: "智能装备事业部",
-      head: "高磊",
-      kpis: [
-        { kpi: "订单交付准时率", target: "≥ 98%", weight: "35%" },
-        { kpi: "良品率", target: "≥ 99.2%", weight: "25%" },
-        { kpi: "单台制造工时", target: "下降 8%", weight: "20%" },
-      ],
-    },
-    {
-      name: "销售中心",
-      head: "陈航",
-      kpis: [
-        { kpi: "回款额", target: "10.8 亿元", weight: "40%" },
-        { kpi: "新客户开发", target: "≥ 35 家", weight: "25%" },
-        { kpi: "客户满意度", target: "≥ 90 分", weight: "15%" },
-      ],
-    },
+interface KpiItem { kpi: string; target: string; weight: string }
+interface DeptStrategy { name: string; head: string; kpis: KpiItem[] }
+interface CompanyStrategy { title: string; period: string; items: KpiItem[] }
+
+const initialCompany: CompanyStrategy = {
+  title: "2025 年公司战略目标",
+  period: "2025 年度",
+  items: [
+    { kpi: "营业收入", target: "12.6 亿元", weight: "30%" },
+    { kpi: "激光焊接订单交付率", target: "≥ 98%", weight: "20%" },
+    { kpi: "新产品研发上市", target: "6 款", weight: "20%" },
+    { kpi: "客户投诉响应时长", target: "≤ 4 小时", weight: "15%" },
+    { kpi: "人均效能提升", target: "+12%", weight: "15%" },
   ],
 };
+
+const initialDepts: DeptStrategy[] = [
+  {
+    name: "研发中心",
+    head: "周建国",
+    kpis: [
+      { kpi: "新产品立项→量产周期", target: "≤ 9 个月", weight: "30%" },
+      { kpi: "专利申请数", target: "≥ 24 项", weight: "20%" },
+      { kpi: "BOM 成本下降率", target: "≥ 5%", weight: "20%" },
+    ],
+  },
+  {
+    name: "智能装备事业部",
+    head: "高磊",
+    kpis: [
+      { kpi: "订单交付准时率", target: "≥ 98%", weight: "35%" },
+      { kpi: "良品率", target: "≥ 99.2%", weight: "25%" },
+      { kpi: "单台制造工时", target: "下降 8%", weight: "20%" },
+    ],
+  },
+  {
+    name: "销售中心",
+    head: "陈航",
+    kpis: [
+      { kpi: "回款额", target: "10.8 亿元", weight: "40%" },
+      { kpi: "新客户开发", target: "≥ 35 家", weight: "25%" },
+      { kpi: "客户满意度", target: "≥ 90 分", weight: "15%" },
+    ],
+  },
+];
 
 /* ================== 指标库 ================== */
 const indicatorFamilies = [
