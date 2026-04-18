@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { ResumeLibraryPanel } from "./ResumeLibrary";
 import {
   Briefcase,
   Plus,
@@ -143,18 +144,26 @@ const urgencyStyle: Record<string, string> = {
 };
 
 export default function Recruiting() {
-  const [tab, setTab] = useState<"all" | JobStatus>("all");
+  const [params, setParams] = useSearchParams();
+  const mainTab = params.get("tab") === "resumes" ? "resumes" : "jobs";
+  const setMainTab = (v: string) => {
+    if (v === "jobs") params.delete("tab");
+    else params.set("tab", v);
+    setParams(params, { replace: true });
+  };
+
+  const [statusTab, setStatusTab] = useState<"all" | JobStatus>("all");
   const [keyword, setKeyword] = useState("");
   const [dept, setDept] = useState("all");
 
   const filtered = useMemo(() => {
     return jobs.filter((j) => {
-      if (tab !== "all" && j.status !== tab) return false;
+      if (statusTab !== "all" && j.status !== statusTab) return false;
       if (dept !== "all" && j.dept !== dept) return false;
       if (keyword && !j.title.includes(keyword) && !j.dept.includes(keyword)) return false;
       return true;
     });
-  }, [tab, dept, keyword]);
+  }, [statusTab, dept, keyword]);
 
   const stats = useMemo(
     () => ({
@@ -169,81 +178,99 @@ export default function Recruiting() {
   return (
     <div className="flex flex-col">
       <PageHeader
-        title="招聘需求池"
-        description="集中管理各部门招聘需求，AI 协助生成岗位画像并智能匹配候选人"
+        title="招聘助手"
+        description="集中管理岗位需求与简历库，AI 协助生成岗位画像并智能匹配候选人"
         actions={
-          <>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/recruiting/resumes">
-                <FileText className="h-4 w-4" />
-                简历库
-              </Link>
-            </Button>
+          mainTab === "jobs" ? (
             <Button size="sm">
-              <Plus className="h-4 w-4" />
-              新建岗位需求
+              <Plus className="h-4 w-4" />新建岗位需求
             </Button>
-          </>
+          ) : null
         }
       />
 
+      <div className="border-b bg-card px-6">
+        <Tabs value={mainTab} onValueChange={setMainTab}>
+          <TabsList className="h-10 bg-transparent p-0">
+            <TabsTrigger
+              value="jobs"
+              className="h-10 rounded-none border-b-2 border-transparent bg-transparent px-4 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+            >
+              <Briefcase className="h-4 w-4" />招聘需求池
+            </TabsTrigger>
+            <TabsTrigger
+              value="resumes"
+              className="h-10 rounded-none border-b-2 border-transparent bg-transparent px-4 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+            >
+              <FileText className="h-4 w-4" />简历库
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
       <div className="space-y-4 p-6">
-        {/* 统计卡 */}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <StatCard icon={Briefcase} label="岗位总数" value={stats.total} tone="primary" />
-          <StatCard icon={TrendingUp} label="招聘中" value={stats.active} tone="success" />
-          <StatCard icon={Sparkles} label="画像待生成" value={stats.pending} tone="warning" />
-          <StatCard icon={FileText} label="累计简历" value={stats.resumes} tone="info" />
-        </div>
-
-        {/* 筛选 */}
-        <Card className="p-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
-              <TabsList>
-                <TabsTrigger value="all">全部</TabsTrigger>
-                <TabsTrigger value="招聘中">招聘中</TabsTrigger>
-                <TabsTrigger value="画像待生成">画像待生成</TabsTrigger>
-                <TabsTrigger value="已暂停">已暂停</TabsTrigger>
-              </TabsList>
-            </Tabs>
-            <div className="ml-auto flex flex-wrap items-center gap-2">
-              <Select value={dept} onValueChange={setDept}>
-                <SelectTrigger className="h-9 w-[140px]">
-                  <SelectValue placeholder="部门" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">全部部门</SelectItem>
-                  <SelectItem value="技术中心">技术中心</SelectItem>
-                  <SelectItem value="运营中心">运营中心</SelectItem>
-                  <SelectItem value="职能部门">职能部门</SelectItem>
-                  <SelectItem value="生产一线">生产一线</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="搜索岗位 / 部门"
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  className="h-9 w-[200px] pl-8"
-                />
-              </div>
+        {mainTab === "jobs" ? (
+          <>
+            {/* 统计卡 */}
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <StatCard icon={Briefcase} label="岗位总数" value={stats.total} tone="primary" />
+              <StatCard icon={TrendingUp} label="招聘中" value={stats.active} tone="success" />
+              <StatCard icon={Sparkles} label="画像待生成" value={stats.pending} tone="warning" />
+              <StatCard icon={FileText} label="累计简历" value={stats.resumes} tone="info" />
             </div>
-          </div>
-        </Card>
 
-        {/* 岗位卡片网格 */}
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
-          {filtered.length === 0 && (
-            <Card className="col-span-full p-10 text-center text-sm text-muted-foreground">
-              没有符合条件的岗位
+            {/* 筛选 */}
+            <Card className="p-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <Tabs value={statusTab} onValueChange={(v) => setStatusTab(v as typeof statusTab)}>
+                  <TabsList>
+                    <TabsTrigger value="all">全部</TabsTrigger>
+                    <TabsTrigger value="招聘中">招聘中</TabsTrigger>
+                    <TabsTrigger value="画像待生成">画像待生成</TabsTrigger>
+                    <TabsTrigger value="已暂停">已暂停</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+                <div className="ml-auto flex flex-wrap items-center gap-2">
+                  <Select value={dept} onValueChange={setDept}>
+                    <SelectTrigger className="h-9 w-[140px]">
+                      <SelectValue placeholder="部门" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">全部部门</SelectItem>
+                      <SelectItem value="技术中心">技术中心</SelectItem>
+                      <SelectItem value="运营中心">运营中心</SelectItem>
+                      <SelectItem value="职能部门">职能部门</SelectItem>
+                      <SelectItem value="生产一线">生产一线</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder="搜索岗位 / 部门"
+                      value={keyword}
+                      onChange={(e) => setKeyword(e.target.value)}
+                      className="h-9 w-[200px] pl-8"
+                    />
+                  </div>
+                </div>
+              </div>
             </Card>
-          )}
-        </div>
+
+            {/* 岗位卡片网格 */}
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {filtered.map((job) => (
+                <JobCard key={job.id} job={job} />
+              ))}
+              {filtered.length === 0 && (
+                <Card className="col-span-full p-10 text-center text-sm text-muted-foreground">
+                  没有符合条件的岗位
+                </Card>
+              )}
+            </div>
+          </>
+        ) : (
+          <ResumeLibraryPanel />
+        )}
       </div>
     </div>
   );
