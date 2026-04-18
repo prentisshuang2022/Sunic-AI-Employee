@@ -139,9 +139,6 @@ export default function Training() {
             <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
               <FileUp className="h-4 w-4 mr-1.5" />导入培训材料
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setExamOpen(true)}>
-              <Plus className="h-4 w-4 mr-1.5" />发起新考试
-            </Button>
           </>
         }
       />
