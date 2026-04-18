@@ -58,7 +58,7 @@ const overviewStats = [
   {
     label: "在考周期",
     value: "2025 Q2",
-    hint: "覆盖 9 部门 · 202 人",
+    hint: "覆盖 11 部门 · 202 人",
     icon: Gauge,
     tone: "text-primary",
   },
@@ -134,7 +134,7 @@ const initialCompany: CompanyStrategy = {
 
 const initialDepts: DeptStrategy[] = [
   {
-    name: "研发中心",
+    name: "研发部",
     head: "周建国",
     kpis: [
       { kpi: "新产品立项→量产周期", target: "≤ 9 个月", weight: "30%" },
@@ -143,7 +143,7 @@ const initialDepts: DeptStrategy[] = [
     ],
   },
   {
-    name: "智能装备事业部",
+    name: "生产管理部",
     head: "高磊",
     kpis: [
       { kpi: "订单交付准时率", target: "≥ 98%", weight: "35%" },
@@ -152,7 +152,7 @@ const initialDepts: DeptStrategy[] = [
     ],
   },
   {
-    name: "销售中心",
+    name: "营销中心",
     head: "陈航",
     kpis: [
       { kpi: "回款额", target: "10.8 亿元", weight: "40%" },
@@ -186,18 +186,20 @@ const dataSources = [
   { name: "QMS 质量管理", status: "已联通", lastSync: "30 分钟前", indicators: 6 },
 ];
 const progressRows = [
-  { dept: "智能装备事业部", kpi: "订单交付准时率", target: "98%", current: 96.4, trend: "down", risk: "预警" },
-  { dept: "研发中心", kpi: "新产品立项→量产", target: "≤ 9 月", current: 78, trend: "up", risk: "正常" },
-  { dept: "销售中心", kpi: "回款额 (亿)", target: "10.8", current: 62, trend: "up", risk: "正常" },
-  { dept: "质量中心", kpi: "客户投诉响应", target: "≤ 4h", current: 51, trend: "down", risk: "滞后" },
+  { dept: "生产管理部", kpi: "订单交付准时率", target: "98%", current: 96.4, trend: "down", risk: "预警" },
+  { dept: "研发部", kpi: "新产品立项→量产", target: "≤ 9 月", current: 78, trend: "up", risk: "正常" },
+  { dept: "营销中心", kpi: "回款额 (亿)", target: "10.8", current: 62, trend: "up", risk: "正常" },
+  { dept: "品质管理部", kpi: "客户投诉响应", target: "≤ 4h", current: 51, trend: "down", risk: "滞后" },
+  { dept: "项目管理部", kpi: "重点项目里程碑达成", target: "100%", current: 84, trend: "up", risk: "正常" },
+  { dept: "供应链", kpi: "关键物料齐套率", target: "≥ 95%", current: 88, trend: "down", risk: "预警" },
 ];
 
 /* ================== 面谈辅助 ================== */
 const interviewQueue = [
-  { id: "I001", name: "王 磊", dept: "智能装备事业部", role: "高级工艺工程师", score: 87, level: "B+", status: "待面谈", reason: "OEE 显著提升，建议晋升沟通" },
-  { id: "I002", name: "李 雪", dept: "销售中心", role: "大客户经理", score: 72, level: "B-", status: "待面谈", reason: "回款滞后，需改进计划" },
-  { id: "I003", name: "张 涛", dept: "研发中心", role: "光学算法工程师", score: 92, level: "A", status: "已完成", reason: "保留沟通 + 项目奖励" },
-  { id: "I004", name: "孙 玥", dept: "供应链中心", role: "采购主管", score: 65, level: "C", status: "待面谈", reason: "成本指标未达成，需绩改" },
+  { id: "I001", name: "王 磊", dept: "生产管理部", role: "高级工艺工程师", score: 87, level: "B+", status: "待面谈", reason: "OEE 显著提升，建议晋升沟通" },
+  { id: "I002", name: "李 雪", dept: "营销中心", role: "大客户经理", score: 72, level: "B-", status: "待面谈", reason: "回款滞后，需改进计划" },
+  { id: "I003", name: "张 涛", dept: "研发部", role: "光学算法工程师", score: 92, level: "A", status: "已完成", reason: "保留沟通 + 项目奖励" },
+  { id: "I004", name: "孙 玥", dept: "供应链", role: "采购主管", score: 65, level: "C", status: "待面谈", reason: "成本指标未达成，需绩改" },
 ];
 
 export default function Performance() {
@@ -241,7 +243,7 @@ export default function Performance() {
     // 模拟 AI 拆解：清空并加入若干推荐项
     setDepts((ds) => ds.map((d) => ({
       ...d,
-      kpis: d.name === "研发中心"
+      kpis: d.name === "研发部"
         ? [
             { kpi: "新产品上市数量", target: "≥ 6 款", weight: "30%" },
             { kpi: "研发立项→量产周期", target: "≤ 9 个月", weight: "25%" },
@@ -249,7 +251,7 @@ export default function Performance() {
             { kpi: "专利申请数", target: "≥ 24 项", weight: "15%" },
             { kpi: "客诉技术响应", target: "≤ 4 小时", weight: "10%" },
           ]
-        : d.name === "智能装备事业部"
+        : d.name === "生产管理部"
         ? [
             { kpi: "订单交付准时率", target: "≥ 98%", weight: "30%" },
             { kpi: "产值贡献", target: "8.4 亿元", weight: "25%" },
