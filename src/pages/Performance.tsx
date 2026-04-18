@@ -50,6 +50,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { NewCycleDialog } from "@/components/performance/NewCycleDialog";
 
 /* ================== 顶部核心指标 ================== */
 const overviewStats = [
@@ -203,6 +204,7 @@ export default function Performance() {
   const [tab, setTab] = useState("cycle");
   const [family, setFamily] = useState<string>("all");
   const [search, setSearch] = useState("");
+  const [newCycleOpen, setNewCycleOpen] = useState(false);
 
   // 战略目标 state
   const [company, setCompany] = useState<CompanyStrategy>(initialCompany);
@@ -282,7 +284,7 @@ export default function Performance() {
               <Bell className="mr-1.5 h-4 w-4" />
               一键催办
             </Button>
-            <Button size="sm" onClick={() => toast.success("已创建新考核周期草稿")}>
+            <Button size="sm" onClick={() => setNewCycleOpen(true)}>
               <Plus className="mr-1.5 h-4 w-4" />
               新建考核周期
             </Button>
