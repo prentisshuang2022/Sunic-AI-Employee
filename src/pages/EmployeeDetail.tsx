@@ -385,10 +385,10 @@ export default function EmployeeDetail() {
                 </div>
                 <div className="space-y-3">
                   {[
-                    { date: "2025-04-14 11:08", desc: "钉钉拉取：现任职务变更", ok: true },
-                    { date: "2024-09-01 14:22", desc: "钉钉拉取：部门变更（市场部 → 销售部）", ok: true },
-                    { date: "2023-05-21 09:10", desc: "钉钉拉取：合同续签字段更新", ok: true },
-                    { date: "2020-05-20 10:00", desc: "钉钉拉取：员工建档", ok: true },
+                    { date: "2025-04-14 11:08", desc: "钉钉同步：现任职务变更", ok: true },
+                    { date: "2024-09-01 14:22", desc: "钉钉同步：部门变更（市场部 → 销售部）", ok: true },
+                    { date: "2023-05-21 09:10", desc: "钉钉同步：合同续签字段更新", ok: true },
+                    { date: "2020-05-20 10:00", desc: "钉钉同步：员工建档", ok: true },
                   ].map((r, i) => (
                     <div key={i} className="flex items-start gap-3 text-sm">
                       <div className="h-7 w-7 rounded-md flex items-center justify-center shrink-0 bg-primary/10 text-primary">
