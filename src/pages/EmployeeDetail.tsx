@@ -437,6 +437,29 @@ export default function EmployeeDetail() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <TransferDialog
+        ctx={{
+          id: EMP.id,
+          name: EMP.name,
+          department: EMP.department,
+          position: EMP.position,
+          payroll: EMP.payroll,
+        }}
+        open={transferOpen}
+        onClose={() => setTransferOpen(false)}
+      />
+      <LeaveDialog
+        ctx={{
+          id: EMP.id,
+          name: EMP.name,
+          department: EMP.department,
+          position: EMP.position,
+          hireDate: EMP.hireDate,
+        }}
+        open={leaveOpen}
+        onClose={() => setLeaveOpen(false)}
+      />
     </>
   );
 }
