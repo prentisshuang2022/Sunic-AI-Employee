@@ -509,12 +509,12 @@ function SceneCard({
           className={cn(
             tagColor === "ai" && "bg-[hsl(var(--ai))] text-[hsl(var(--ai-foreground))] hover:bg-[hsl(var(--ai))]/90"
           )}
-          onClick={() => toast.success(`已进入${title}`)}
+          onClick={onPrimary ?? (() => toast.success(`已进入${title}`))}
         >
           {primaryLabel}
           <ArrowRight className="h-3.5 w-3.5 ml-1" />
         </Button>
-        <Button size="sm" variant="outline" onClick={() => toast.info(secondaryLabel)}>
+        <Button size="sm" variant="outline" onClick={onSecondary ?? (() => toast.info(secondaryLabel))}>
           {secondaryLabel}
         </Button>
       </div>
