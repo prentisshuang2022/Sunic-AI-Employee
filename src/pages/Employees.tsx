@@ -161,7 +161,7 @@ export default function Employees() {
   const [tab, setTab] = useState("list");
   const [keyword, setKeyword] = useState("");
   const [department, setDepartment] = useState<string>("all");
-  const [syncFilter, setSyncFilter] = useState<string>("all");
+  const [entityFilter, setEntityFilter] = useState<string>("all");
   const [contractFilter, setContractFilter] = useState<string>("all");
   const [statFilter, setStatFilter] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
@@ -188,7 +188,7 @@ export default function Employees() {
         if (![r.name, r.phone, r.department, r.position].some((v) => v.toLowerCase().includes(k))) return false;
       }
       if (department !== "all" && r.department !== department) return false;
-      if (syncFilter !== "all" && r.syncStatus !== syncFilter) return false;
+      if (entityFilter !== "all" && r.entity !== entityFilter) return false;
       if (contractFilter !== "all" && r.contractStatus !== contractFilter) return false;
       if (statFilter === "contract" && r.contractStatus === "normal") return false;
       if (statFilter === "id" && r.idStatus === "normal") return false;
@@ -196,7 +196,7 @@ export default function Employees() {
       if (statFilter === "sync" && r.syncStatus === "synced") return false;
       return true;
     });
-  }, [keyword, department, syncFilter, contractFilter, statFilter]);
+  }, [keyword, department, entityFilter, contractFilter, statFilter]);
 
   const toggleAll = (checked: boolean) => setSelected(checked ? filtered.map((r) => r.id) : []);
   const toggleOne = (id: string) => setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
